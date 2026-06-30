@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-// Parses the per-city CSV food lists in ./data into app/data.js
-// Run: node build.js
+// Parses the per-city CSV food lists in ./data.
+//   - Run directly (`node build.js`)  -> writes app/data.js (offline fallback).
+//   - Required as a module            -> exports buildCities() for seeding Postgres.
 const fs = require('fs');
 const path = require('path');
 
@@ -48,8 +49,6 @@ function cleanCuisine(raw) {
   if (!s) return 'Other';
   const key = s.toLowerCase();
   if (CUISINE_FIXES[key]) return CUISINE_FIXES[key];
-  // Title-case single words so "chinese" === "Chinese"; leave multi-word /
-  // hyphenated labels (e.g. "Vietnamese-French", "Asian Fusion") as authored.
   if (/^[a-z]+$/.test(key)) return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
   return s;
 }
@@ -61,72 +60,78 @@ const CITY_META = {
   'SEATTLE':      { id: 'sea', name: 'Seattle',       region: 'PNW',      emoji: '🌧️' },
 };
 
-// Supplemental Yelp links for rows whose CSV "Yelp" column is blank.
-// Keyed by "<cityId>|<exact place name>". See data/yelp-links.json.
-let YELP_LINKS = {};
-try {
-  YELP_LINKS = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'yelp-links.json'), 'utf8'));
-} catch (e) { /* optional file */ }
+const ORDER = ['la', 'sf', 'ny', 'sea'];
 
-const files = fs.readdirSync(DATA_DIR).filter(f => f.toLowerCase().endsWith('.csv'));
-const cities = [];
-let filledFromOverrides = 0;
+// Parse every data/*.csv into the same shape the guide renders:
+// [{ id, name, region, emoji, count, places: [{ tried, name, cuisine, ... }] }]
+function buildCities({ quiet = false } = {}) {
+  let YELP_LINKS = {};
+  try {
+    YELP_LINKS = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'yelp-links.json'), 'utf8'));
+  } catch (e) { /* optional file */ }
 
-for (const file of files) {
-  const m = file.match(/USA FOOD LIST - (.+)\.csv$/i);
-  if (!m) continue;
-  const key = m[1].trim().toUpperCase();
-  const meta = CITY_META[key];
-  if (!meta) { console.warn('Skipping unknown city file:', file); continue; }
+  const files = fs.readdirSync(DATA_DIR).filter(f => f.toLowerCase().endsWith('.csv'));
+  const cities = [];
+  let filledFromOverrides = 0;
 
-  const rows = parseCSV(fs.readFileSync(path.join(DATA_DIR, file), 'utf8'));
+  for (const file of files) {
+    const m = file.match(/USA FOOD LIST - (.+)\.csv$/i);
+    if (!m) continue;
+    const key = m[1].trim().toUpperCase();
+    const meta = CITY_META[key];
+    if (!meta) { if (!quiet) console.warn('Skipping unknown city file:', file); continue; }
 
-  // Find the header row (contains "Name").
-  let headerIdx = rows.findIndex(r => r.some(c => c.trim().toLowerCase() === 'name'));
-  if (headerIdx === -1) continue;
-  const header = rows[headerIdx].map(c => c.trim().toLowerCase());
-  const col = (label) => header.indexOf(label);
-  const idx = {
-    tried: col('tried'),
-    name: col('name'),
-    cuisine: col('cuisine'),
-    description: col('description'),
-    location: col('location'),
-    price: col('price'),
-    yelp: col('yelp'),
-  };
+    const rows = parseCSV(fs.readFileSync(path.join(DATA_DIR, file), 'utf8'));
+    let headerIdx = rows.findIndex(r => r.some(c => c.trim().toLowerCase() === 'name'));
+    if (headerIdx === -1) continue;
+    const header = rows[headerIdx].map(c => c.trim().toLowerCase());
+    const col = (label) => header.indexOf(label);
+    const idx = {
+      tried: col('tried'), name: col('name'), cuisine: col('cuisine'),
+      description: col('description'), location: col('location'),
+      price: col('price'), yelp: col('yelp'),
+    };
 
-  const places = [];
-  for (let r = headerIdx + 1; r < rows.length; r++) {
-    const row = rows[r];
-    const get = (i) => (i >= 0 && row[i] != null ? row[i].trim() : '');
-    const name = get(idx.name);
-    if (!name) continue;
-    let yelp = get(idx.yelp);
-    if (!yelp) {
-      const key = `${meta.id}|${name}`;
-      if (YELP_LINKS[key]) { yelp = YELP_LINKS[key]; filledFromOverrides++; }
+    const places = [];
+    for (let r = headerIdx + 1; r < rows.length; r++) {
+      const row = rows[r];
+      const get = (i) => (i >= 0 && row[i] != null ? row[i].trim() : '');
+      const name = get(idx.name);
+      if (!name) continue;
+      let yelp = get(idx.yelp);
+      if (!yelp) {
+        const k = `${meta.id}|${name}`;
+        if (YELP_LINKS[k]) { yelp = YELP_LINKS[k]; filledFromOverrides++; }
+      }
+      places.push({
+        tried: /true/i.test(get(idx.tried)),
+        name,
+        cuisine: cleanCuisine(get(idx.cuisine)),
+        description: get(idx.description),
+        location: get(idx.location),
+        price: get(idx.price),
+        yelp,
+      });
     }
-    places.push({
-      tried: /true/i.test(get(idx.tried)),
-      name,
-      cuisine: cleanCuisine(get(idx.cuisine)),
-      description: get(idx.description),
-      location: get(idx.location),
-      price: get(idx.price),
-      yelp,
-    });
+
+    cities.push({ ...meta, count: places.length, places });
+    if (!quiet) console.log(`${meta.name}: ${places.length} places`);
   }
 
-  cities.push({ ...meta, count: places.length, places });
-  console.log(`${meta.name}: ${places.length} places`);
+  cities.sort((a, b) => ORDER.indexOf(a.id) - ORDER.indexOf(b.id));
+  if (!quiet && filledFromOverrides) {
+    console.log(`Filled ${filledFromOverrides} missing Yelp links from yelp-links.json`);
+  }
+  return cities;
 }
 
-// Keep a stable display order.
-const order = ['la', 'sf', 'ny', 'sea'];
-cities.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+function writeDataJs() {
+  const cities = buildCities();
+  fs.mkdirSync(path.dirname(OUT), { recursive: true });
+  fs.writeFileSync(OUT, 'window.FOODIE_DATA = ' + JSON.stringify({ cities }, null, 2) + ';\n');
+  console.log('Wrote', OUT);
+}
 
-fs.mkdirSync(path.dirname(OUT), { recursive: true });
-fs.writeFileSync(OUT, 'window.FOODIE_DATA = ' + JSON.stringify({ cities }, null, 2) + ';\n');
-console.log(`Filled ${filledFromOverrides} missing Yelp links from yelp-links.json`);
-console.log('Wrote', OUT);
+module.exports = { buildCities, parseCSV, cleanCuisine, CITY_META, ORDER };
+
+if (require.main === module) writeDataJs();

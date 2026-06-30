@@ -476,8 +476,9 @@
   <script src="data.js"></script>
   <script>
   (function () {
-    const DATA = (window.FOODIE_DATA && window.FOODIE_DATA.cities) || [];
-    const state = { city: DATA[0] && DATA[0].id, q: "", status: "all", cuisine: null, price: null };
+    const API_BASE = window.API_BASE || "";
+    let DATA = [];
+    const state = { city: undefined, q: "", status: "all", cuisine: null, price: null };
 
     const $ = (s) => document.querySelector(s);
     const grid = $("#grid");
@@ -638,15 +639,29 @@
     $("#clearBtn").addEventListener("click", clearAll);
 
     // ---- Boot ----
-    if (!DATA.length) {
-      grid.innerHTML = `<div class="empty"><h3>No data loaded</h3><p>Run <code>node build.js</code> to generate app/data.js, then refresh.</p></div>`;
-    } else {
+    function start() {
+      if (!DATA.length) {
+        grid.innerHTML = `<div class="empty"><h3>No data loaded</h3><p>The guide couldn't reach the server. Try again in a moment.</p></div>`;
+        return;
+      }
+      state.city = DATA[0].id;
       $("#footTotal").textContent = DATA.reduce((n, c) => n + c.count, 0);
       renderCities();
       renderCityHead();
       renderChips();
       render();
     }
+
+    // Primary source of truth is Postgres via /api/places; fall back to the
+    // statically-built data.js if the API is unreachable.
+    grid.innerHTML = `<div class="empty"><h3>Loading the list…</h3><p>Fetching the latest spots.</p></div>`;
+    fetch(API_BASE + "/api/places", { headers: { Accept: "application/json" } })
+      .then((r) => { if (!r.ok) throw new Error("api"); return r.json(); })
+      .then((d) => { DATA = (d && d.cities) || []; start(); })
+      .catch(() => {
+        DATA = (window.FOODIE_DATA && window.FOODIE_DATA.cities) || [];
+        start();
+      });
   })();
   </script>
 </body>

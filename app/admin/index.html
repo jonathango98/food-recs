@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The List — Admin · Review</title>
+<meta name="robots" content="noindex" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #FBF7EE; --card: #FFFDF8; --ink: #1E1B17; --ink-soft: #756B5F;
+    --line: #E6DCCB; --line-strong: #D6C9B2; --tomato: #D8412F; --pine: #176B5C;
+    --gold: #E8A33D; --shadow: 14px 16px 0 rgba(30, 27, 23, 0.06); --r: 4px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background-color: var(--paper);
+    background-image: radial-gradient(rgba(30,27,23,0.035) 1px, transparent 1px);
+    background-size: 22px 22px; color: var(--ink);
+    font-family: "Newsreader", Georgia, serif; font-size: 17px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+  a { color: var(--tomato); text-underline-offset: 3px; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px 80px; }
+
+  header.masthead { padding: 40px 0 8px; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+  .kicker {
+    font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--tomato);
+  }
+  h1.title {
+    font-family: "Bricolage Grotesque", sans-serif; font-weight: 800;
+    font-size: clamp(2rem, 5vw, 3rem); line-height: 0.95; letter-spacing: -0.02em; margin: 12px 0 0;
+  }
+  h1.title em { font-style: normal; color: var(--tomato); }
+  .topright { font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--ink-soft); text-align: right; }
+  .linkbtn { appearance: none; background: none; border: 0; cursor: pointer; color: var(--tomato); font: inherit; padding: 0; }
+
+  /* ---- Login ---- */
+  .login {
+    max-width: 380px; margin: 60px auto; background: var(--card);
+    border: 1.5px solid var(--line-strong); border-radius: var(--r);
+    box-shadow: var(--shadow); padding: 28px;
+  }
+  .login h2 { font-family: "Bricolage Grotesque", sans-serif; margin: 0 0 4px; }
+  .login p { color: var(--ink-soft); font-size: 14px; margin: 0 0 18px; }
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block; font-family: "JetBrains Mono", monospace; font-size: 11px;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 6px;
+  }
+  .field input, .field select {
+    width: 100%; font-family: inherit; font-size: 16px; color: var(--ink);
+    background: var(--paper); border: 1.5px solid var(--line-strong); border-radius: var(--r); padding: 10px 12px;
+  }
+  .field input:focus, .field select:focus { outline: none; border-color: var(--tomato); }
+  .btn {
+    appearance: none; cursor: pointer; font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 700; font-size: 15px; border-radius: var(--r); padding: 10px 18px;
+    border: 1.5px solid var(--tomato); background: var(--tomato); color: #fff;
+  }
+  .btn:hover { filter: brightness(1.05); }
+  .btn.ghost { background: transparent; color: var(--ink); border-color: var(--ink); }
+  .btn.ghost:hover { background: rgba(30,27,23,0.05); }
+  .btn:disabled { opacity: 0.5; cursor: default; }
+  .msg { font-family: "JetBrains Mono", monospace; font-size: 13px; margin-top: 10px; min-height: 18px; }
+  .msg.err { color: var(--tomato); }
+
+  /* ---- Tabs ---- */
+  .tabs { display: flex; gap: 8px; margin: 28px 0 18px; flex-wrap: wrap; }
+  .tab {
+    appearance: none; cursor: pointer; background: var(--card);
+    border: 1.5px solid var(--line-strong); border-radius: var(--r);
+    font-family: "JetBrains Mono", monospace; font-size: 13px; padding: 8px 14px; color: var(--ink-soft);
+  }
+  .tab[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .tab .n { opacity: 0.7; }
+
+  /* ---- Cards ---- */
+  .list { display: grid; gap: 14px; }
+  .sub {
+    background: var(--card); border: 1.5px solid var(--line-strong);
+    border-radius: var(--r); padding: 16px 18px; position: relative;
+  }
+  .sub .head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .sub .name { font-family: "Bricolage Grotesque", sans-serif; font-weight: 700; font-size: 1.3rem; }
+  .sub .city {
+    font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--ink-soft);
+  }
+  .sub .meta { font-family: "JetBrains Mono", monospace; font-size: 12.5px; color: var(--ink-soft); margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px 16px; }
+  .sub .meta b { color: var(--ink); font-weight: 500; }
+  .sub .order { margin: 10px 0 0; }
+  .sub .order .lead { font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--tomato); margin-right: 8px; }
+  .sub .note { margin: 10px 0 0; font-style: italic; color: var(--ink); border-left: 3px solid var(--line-strong); padding-left: 12px; }
+  .sub .by { margin-top: 8px; font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--ink-soft); }
+  .badge {
+    font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 100px; border: 1.5px solid;
+  }
+  .badge.pending { color: var(--gold); border-color: var(--gold); }
+  .badge.approved { color: var(--pine); border-color: var(--pine); }
+  .badge.rejected { color: var(--tomato); border-color: var(--tomato); }
+
+  .actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
+  .actions .spacer { flex: 1; }
+  .abtn {
+    appearance: none; cursor: pointer; font-family: "JetBrains Mono", monospace;
+    font-size: 12px; font-weight: 700; border-radius: var(--r); padding: 7px 12px; border: 1.5px solid;
+    background: transparent;
+  }
+  .abtn.approve { color: var(--pine); border-color: var(--pine); }
+  .abtn.approve:hover { background: var(--pine); color: #fff; }
+  .abtn.reject { color: var(--tomato); border-color: var(--tomato); }
+  .abtn.reject:hover { background: var(--tomato); color: #fff; }
+  .abtn.del { color: var(--ink-soft); border-color: var(--line-strong); }
+  .abtn.del:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  .triedtoggle { display: inline-flex; border: 1.5px solid var(--line-strong); border-radius: var(--r); overflow: hidden; }
+  .triedtoggle button {
+    appearance: none; cursor: pointer; background: var(--paper); border: 0;
+    border-right: 1.5px solid var(--line-strong); font-family: "JetBrains Mono", monospace;
+    font-size: 11px; font-weight: 700; padding: 6px 10px; color: var(--ink-soft);
+  }
+  .triedtoggle button:last-child { border-right: 0; }
+  .triedtoggle button.on[data-tried="true"] { background: var(--pine); color: #fff; }
+  .triedtoggle button.on[data-tried="false"] { background: var(--gold); color: var(--ink); }
+
+  .empty { text-align: center; padding: 50px 20px; border: 2px dashed var(--line-strong); border-radius: var(--r); color: var(--ink-soft); }
+  .empty h3 { font-family: "Bricolage Grotesque", sans-serif; color: var(--ink); margin: 0 0 6px; }
+  :focus-visible { outline: 3px solid var(--tomato); outline-offset: 2px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- ---- Login ---- -->
+    <div class="login" id="login">
+      <h2>Admin</h2>
+      <p>Enter the admin password to review submissions.</p>
+      <form id="loginForm">
+        <div class="field">
+          <label for="user">User</label>
+          <input type="text" id="user" value="admin" autocomplete="username" />
+        </div>
+        <div class="field">
+          <label for="pass">Password</label>
+          <input type="password" id="pass" autocomplete="current-password" required />
+        </div>
+        <button type="submit" class="btn" id="loginBtn">Enter →</button>
+        <div class="msg" id="loginMsg"></div>
+      </form>
+    </div>
+
+    <!-- ---- Dashboard ---- -->
+    <div id="dash" hidden>
+      <header class="masthead">
+        <div>
+          <div class="kicker">The List · Admin</div>
+          <h1 class="title">Review <em>submissions</em>.</h1>
+        </div>
+        <div class="topright">
+          <a href="../index.html">View guide ↗</a><br />
+          <button class="linkbtn" id="logout">Log out</button>
+        </div>
+      </header>
+
+      <div class="tabs" id="tabs">
+        <button class="tab" data-status="pending"  aria-pressed="true">Pending <span class="n" id="n-pending"></span></button>
+        <button class="tab" data-status="approved" aria-pressed="false">Approved <span class="n" id="n-approved"></span></button>
+        <button class="tab" data-status="rejected" aria-pressed="false">Rejected <span class="n" id="n-rejected"></span></button>
+        <button class="tab" data-status="all"      aria-pressed="false">All</button>
+      </div>
+
+      <div class="list" id="list"></div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    const API_BASE = window.API_BASE || "";
+    const AUTH_KEY = "foodie-admin-auth";
+    const $ = (s) => document.querySelector(s);
+
+    const CITY = {
+      la:  { name: "Los Angeles",   emoji: "🌴" },
+      sf:  { name: "San Francisco", emoji: "🌉" },
+      ny:  { name: "New York",      emoji: "🗽" },
+      sea: { name: "Seattle",       emoji: "🌧️" },
+    };
+
+    let auth = sessionStorage.getItem(AUTH_KEY) || "";
+    let tab = "pending";
+    let entries = [];
+
+    function esc(s) {
+      return (s || "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    }
+
+    async function api(path, opts = {}) {
+      const res = await fetch(API_BASE + path, {
+        ...opts,
+        headers: { "Authorization": "Basic " + auth, "Content-Type": "application/json", ...(opts.headers || {}) },
+      });
+      if (res.status === 401) { logout("Session expired — log in again."); throw new Error("unauthorized"); }
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Request failed.");
+      return data;
+    }
+
+    // ---- Auth ----
+    $("#loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const user = $("#user").value.trim() || "admin";
+      const pass = $("#pass").value;
+      auth = btoa(user + ":" + pass);
+      $("#loginBtn").disabled = true;
+      $("#loginMsg").textContent = "Checking…"; $("#loginMsg").className = "msg";
+      try {
+        await api("/api/entries?status=pending");
+        sessionStorage.setItem(AUTH_KEY, auth);
+        showDash();
+      } catch (err) {
+        $("#loginMsg").className = "msg err";
+        $("#loginMsg").textContent = err.message === "unauthorized" ? "Wrong password." : err.message;
+      } finally {
+        $("#loginBtn").disabled = false;
+      }
+    });
+
+    function logout(message) {
+      auth = ""; sessionStorage.removeItem(AUTH_KEY);
+      $("#dash").hidden = true; $("#login").hidden = false;
+      $("#pass").value = "";
+      $("#loginMsg").className = "msg" + (message ? " err" : "");
+      $("#loginMsg").textContent = message || "";
+    }
+    $("#logout").addEventListener("click", () => logout(""));
+
+    function showDash() {
+      $("#login").hidden = true; $("#dash").hidden = false;
+      load();
+    }
+
+    // ---- Tabs ----
+    $("#tabs").querySelectorAll(".tab").forEach((b) =>
+      b.addEventListener("click", () => {
+        tab = b.dataset.status;
+        $("#tabs").querySelectorAll(".tab").forEach((x) => x.setAttribute("aria-pressed", x.dataset.status === tab));
+        load();
+      }));
+
+    // ---- Load + render ----
+    async function load() {
+      $("#list").innerHTML = `<div class="empty"><h3>Loading…</h3></div>`;
+      try {
+        const q = tab === "all" ? "" : "?status=" + tab;
+        const data = await api("/api/entries" + q);
+        entries = data.entries || [];
+        render();
+        refreshCounts();
+      } catch (err) {
+        if (err.message !== "unauthorized")
+          $("#list").innerHTML = `<div class="empty"><h3>Couldn't load</h3><p>${esc(err.message)}</p></div>`;
+      }
+    }
+
+    async function refreshCounts() {
+      try {
+        for (const s of ["pending", "approved", "rejected"]) {
+          const d = await api("/api/entries?status=" + s);
+          $("#n-" + s).textContent = "(" + (d.entries || []).length + ")";
+        }
+      } catch (e) { /* ignore */ }
+    }
+
+    function fmtDate(iso) {
+      try { return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" }); }
+      catch (e) { return ""; }
+    }
+
+    function card(e) {
+      const c = CITY[e.city] || { name: e.city, emoji: "" };
+      const yelp = e.yelp ? `<a href="${esc(e.yelp)}" target="_blank" rel="noopener">Yelp ↗</a>` : "—";
+      return `
+        <article class="sub" data-id="${e.id}">
+          <div class="head">
+            <div>
+              <div class="city">${c.emoji} ${esc(c.name)}</div>
+              <div class="name">${esc(e.name)}</div>
+            </div>
+            <span class="badge ${e.status}">${e.status}</span>
+          </div>
+          <div class="meta">
+            <span><b>${esc(e.cuisine || "—")}</b></span>
+            <span>⌖ <b>${esc(e.location || "—")}</b></span>
+            <span><b>${esc(e.price || "—")}</b></span>
+            <span>${yelp}</span>
+          </div>
+          <p class="order"><span class="lead">▸ ORDER</span>${esc(e.description || "—")}</p>
+          ${e.note ? `<p class="note">${esc(e.note)}</p>` : ""}
+          <div class="by">— ${esc(e.submitted_by || "anonymous")} · ${fmtDate(e.created_at)}</div>
+          <div class="actions">
+            <div class="triedtoggle" role="group" aria-label="Tried status">
+              <button data-tried="true"  class="${e.tried ? "on" : ""}">✓ Tried</button>
+              <button data-tried="false" class="${e.tried ? "" : "on"}">○ On the list</button>
+            </div>
+            <div class="spacer"></div>
+            ${e.status !== "approved" ? `<button class="abtn approve" data-act="approved">Approve</button>` : `<button class="abtn reject" data-act="pending">Unpublish</button>`}
+            ${e.status !== "rejected" ? `<button class="abtn reject" data-act="rejected">Reject</button>` : ""}
+            <button class="abtn del" data-act="delete">Delete</button>
+          </div>
+        </article>`;
+    }
+
+    function render() {
+      if (!entries.length) {
+        $("#list").innerHTML = `<div class="empty"><h3>Nothing here</h3><p>No ${tab === "all" ? "" : tab} submissions.</p></div>`;
+        return;
+      }
+      $("#list").innerHTML = entries.map(card).join("");
+      $("#list").querySelectorAll(".sub").forEach(wire);
+    }
+
+    function wire(el) {
+      const id = el.dataset.id;
+      el.querySelectorAll(".triedtoggle button").forEach((b) =>
+        b.addEventListener("click", async () => {
+          const tried = b.dataset.tried === "true";
+          try {
+            await api("/api/entries/" + id, { method: "PATCH", body: JSON.stringify({ tried }) });
+            el.querySelectorAll(".triedtoggle button").forEach((x) =>
+              x.classList.toggle("on", x.dataset.tried === String(tried)));
+            const e = entries.find((x) => String(x.id) === String(id)); if (e) e.tried = tried;
+          } catch (err) { alert(err.message); }
+        }));
+
+      el.querySelectorAll("[data-act]").forEach((b) =>
+        b.addEventListener("click", async () => {
+          const act = b.dataset.act;
+          try {
+            if (act === "delete") {
+              if (!confirm("Delete this submission permanently?")) return;
+              await api("/api/entries/" + id, { method: "DELETE" });
+            } else {
+              await api("/api/entries/" + id, { method: "PATCH", body: JSON.stringify({ status: act }) });
+            }
+            load();
+          } catch (err) { alert(err.message); }
+        }));
+    }
+
+    // ---- Boot ----
+    if (auth) {
+      api("/api/entries?status=pending").then(showDash).catch(() => logout(""));
+    }
+  })();
+  </script>
+</body>
+</html>
