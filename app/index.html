@@ -84,6 +84,27 @@
   }
   .thesis .soft { color: var(--ink-soft); }
 
+  .contribute {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 22px 0 0;
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    color: #fff;
+    background: var(--tomato);
+    border: 1.5px solid var(--tomato);
+    border-radius: var(--r);
+    padding: 11px 18px;
+    box-shadow: var(--shadow);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+  }
+  .contribute .arrow { transition: transform 0.12s ease; }
+  .contribute:hover { transform: translateY(-2px); filter: brightness(1.05); }
+  .contribute:hover .arrow { transform: translateX(3px); }
+
   /* ---------- City tabs ---------- */
   .cities {
     display: grid;
@@ -428,6 +449,8 @@
       <h1 class="title">Where to eat in LA, SF, NY &amp; <em>Seattle</em>.</h1>
       <p class="thesis">Not reviews — a hand-built hit-list of the exact dishes worth ordering.
         <span class="soft">Pick a city, then chase the ones still stamped <b>“On the list.”</b></span></p>
+
+      <a class="contribute" href="entry/">Wanna contribute? <span class="arrow">→</span></a>
 
       <div class="cities" id="cities" role="tablist" aria-label="Choose a city"></div>
     </header>
