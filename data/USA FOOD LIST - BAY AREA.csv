@@ -1,0 +1,60 @@
+,,,,,,,
+,TRIED,Name,Cuisine,Description,Location,Price,Yelp
+,TRUE,Artichoke Basille's Pizza,Western,Artichoke Cream Pizza,Berkeley,$,https://www.yelp.com/biz/artichoke-basilles-pizza-berkeley?dd_referrer=https%3A%2F%2Fwww.google.com%2F
+,TRUE,Thai Basil Cuisine,Thai,Pla Rad Prik (Fried Fish),Berkeley,$$,https://www.yelp.com/biz/thai-basil-cuisine-berkeley?osq=thai+basil
+,TRUE,Noodle Dynasty,Chinese,Noodles,Berkeley,$$,https://www.yelp.com/biz/noodle-dynasty-berkeley?osq=Noodle+Dynasty
+,TRUE,Zhangliang Malatang,Chinese,DIY Malatang,Berkeley,$$,https://www.yelp.com/biz/zhangliang-malatang-berkeley?osq=Zhangliang+Malatang
+,TRUE,Sobo Ramen,Ramen,Ramen,Berkeley,$$,https://www.yelp.com/biz/sobo-ramen-berkeley-3
+,TRUE,Kinda Izakaya,Japanese,Creamy Udon,Berkeley,$$$,https://www.yelp.com/biz/kinda-izakaya-berkeley?osq=Kinda+Izakaya
+,TRUE,The Noodle Thai Restaurant,Thai,Duck Fried Rice,Berkeley,$$,https://www.yelp.com/biz/the-noodle-thai-restaurant-berkeley-8?osq=the+noodle
+,TRUE,Imm Thai Street Food,Thai,Crispy Pork Belly,Berkeley,$$,https://www.yelp.com/biz/imm-thai-street-food-berkeley-5?osq=Imm+Thai+Street+Food
+,TRUE,Daimo Chinese Restaurant,Chinese,Family Style,Berkeley,$$,https://www.yelp.com/biz/daimo-chinese-restaurant-richmond-3?osq=daimo
+,TRUE,Rose Pizzeria,Western,Pizza,Berkeley,$$,https://www.yelp.com/biz/rose-pizzeria-berkeley-2?osq=rose+pizza
+,TRUE,Saul's Restaurant & Delicatessen,Western,Pastrami Reuben,Berkeley,$$,https://www.yelp.com/biz/sauls-restaurant-and-delicatessen-berkeley?osq=Saul%E2%80%99s+Restaurant+%26+Delicatessen
+,TRUE,Cheung Hing,Chinese,"Charsiu, Siobak",Milbrae,$$,https://www.yelp.com/biz/cheung-hing-san-mateo-2?osq=Cheung+Hing
+,TRUE,KoJa Kitchen,Korean,Short Ribs Bowl,Multiple Location,$$,https://www.yelp.com/biz/koja-kitchen-berkeley-2?osq=KoJa+Kitchen
+,TRUE,Farmhouse Kitchen,Thai,"Short Ribs, Fried Chicken",Multiple Location,$$$,https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-berkeley?osq=Farmhouse+Kitchen+Thai+Cuisine
+,TRUE,Rooster & Rice,Thai,Chicken Rice,Multiple Location,$$,
+,TRUE,Moo Bong Ri,Korean,Bossam,Oakland,$$,
+,TRUE,Hanshin Pocha,Korean,"Fried Chicken, Pork Belly with Cheese",Oakland,$$,
+,TRUE,Kungfu Mala,Korean,DIY Malatang,Oakland,$$,
+,TRUE,Gum Kuo,Chinese,Chinese BBQ,Oakland,$,
+,TRUE,Shooting Star,Chinese,"Baked Rice, Tobiko Fried Rice",Oakland,$$,
+,TRUE,Ming's Tasty,Chinese,Dimsum,Oakland,$,
+,TRUE,Kansai Sushi,Japanese,Sushi,Oakland,$$,
+,TRUE,Yank Sing,Chinese,Dimsum,San Francisco,$$$,
+,TRUE,R&G Lounge,Chinese,Seafood,San Francisco,$$$,
+,TRUE,San Tung,Chinese,Fried Chicken,San Francisco,$$,
+,TRUE,Hai Ky Noodle,Chinese,Noodles,San Francisco,$$,
+,TRUE,Daeho,Korean,Kalbi Jjim,San Francisco,$$$,
+,TRUE,Surisan,Brunch,Korean Fusion Brunch,San Francisco,$$,
+,TRUE,YakiniQ,Korean,KBBQ,San Francisco,$$$,
+,TRUE,Marufuku,Japanese,Ramen,San Francisco,$$,
+,TRUE,Mensho Tokyo SF,Japanese,Ramen,San Francisco,$$,
+,TRUE,Shabu Club,Japanese,Shabu-Shabu,San Francisco,$$$,
+,TRUE,Bread n Chu,Japanese,"Sando, Snack",San Francisco,$$,
+,TRUE,NaYa Desserts,Dessert,"Roti Ovaltine, Bingsu",San Francisco,$,
+,TRUE,Arsicault,Bakery,Croissant To Go,San Francisco,$,
+,TRUE,B Patisserie,Bakery,Kouign Amaan,San Francisco,$,
+,TRUE,Pineapple King Bakery,Bakery,Pineapple Bun,San Francisco,$,
+,TRUE,Roli Roti,Western,Porchetta Sandwich,San Francisco,$$,
+,TRUE,Boudin,Western,Chowder,San Francisco,$$,
+,TRUE,Souvla,Dessert,Greek Yogurt,San Francisco,$,
+,TRUE,House of Prime Ribs,Western,Prime Rib Steakhouse,San Francisco,$$$$,
+,TRUE,Breakfast at Tiffany's,Brunch,Classic American Brunch,San Francisco,$$,
+,TRUE,Good Mong Kok Bakery,Chinese,Dimsum Take Away,San Francisco,$,
+,TRUE,99 Chicken,Korean,Fried Chicken,Santa Clara,$$,
+,FALSE,Mikiya,Japanese,Shabu-Shabu,Santa Clara,$$$,
+,TRUE,Home Eat,Chinese,Comfort Chinese,San Jose,$,
+,TRUE,Taiwan Porridge Kingdom,Taiwanese,Comfort Taiwanese,Cupertino,$,
+,TRUE,Ultra Sushi,Japanese,AYCE Sushi,San Mateo,$$$,
+,TRUE,Fish Restaurant,Western,Fish & Chips,Sausalito,$$,
+,TRUE,Lappert's Ice Cream,Dessert,Ice Cream,Sausalito,$,
+,FALSE,Ettan ,Indian ,,Palo Alto,$$$$,
+,FALSE,Orchard Kitchen ,Asian Fusion ,,Campbell,$$$$,
+,FALSE,leichi ,Japanese,,Santa Clara,$$$$,
+,FALSE,Bon bu hue - An Nam ,Vietnamese,Bon bu hue ,San Jose,$,
+,FALSE,lei garden ,Chinese,Dimsum,Cupertino,$$,
+,TRUE,the backayard,Caribean ,Oxtail - Jerk Chicken,San Jose,$,
+,TRUE,Wei's Fish,Chinese,Fish Soup,Cupertino,$$,
+,FALSE,Dinding,Chinese,XLB,"Fremont, Union City",$$,

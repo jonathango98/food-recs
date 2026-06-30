@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The List — Where to eat in LA, SF, NY &amp; Seattle</title>
+<meta name="description" content="A hand-built guide to the exact dishes to order in Los Angeles, San Francisco, New York and Seattle." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #FBF7EE;
+    --card: #FFFDF8;
+    --ink: #1E1B17;
+    --ink-soft: #756B5F;
+    --line: #E6DCCB;
+    --line-strong: #D6C9B2;
+    --tomato: #D8412F;
+    --pine: #176B5C;
+    --gold: #E8A33D;
+    --shadow: 14px 16px 0 rgba(30, 27, 23, 0.06);
+    --r: 4px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background-color: var(--paper);
+    background-image: radial-gradient(rgba(30,27,23,0.035) 1px, transparent 1px);
+    background-size: 22px 22px;
+    color: var(--ink);
+    font-family: "Newsreader", Georgia, serif;
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+
+  a { color: var(--tomato); text-underline-offset: 3px; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- Masthead ---------- */
+  header.masthead { padding: 40px 0 8px; }
+
+  .kicker {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--tomato);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .kicker::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--line-strong);
+  }
+
+  h1.title {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.6rem, 7vw, 5.2rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin: 18px 0 0;
+    max-width: 16ch;
+  }
+  h1.title em { font-style: normal; color: var(--tomato); }
+
+  .thesis {
+    margin: 20px 0 0;
+    font-size: clamp(1.05rem, 2vw, 1.3rem);
+    max-width: 56ch;
+    color: var(--ink);
+  }
+  .thesis .soft { color: var(--ink-soft); }
+
+  /* ---------- City tabs ---------- */
+  .cities {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 34px 0 0;
+  }
+  .city-tab {
+    appearance: none;
+    text-align: left;
+    cursor: pointer;
+    background: var(--card);
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--r);
+    padding: 16px 16px 14px;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+    font-family: inherit;
+    color: inherit;
+    position: relative;
+    overflow: hidden;
+  }
+  .city-tab:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+  .city-tab .emoji { font-size: 26px; line-height: 1; display: block; }
+  .city-tab .cname {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 700;
+    font-size: 1.35rem;
+    letter-spacing: -0.01em;
+    margin-top: 10px;
+    display: block;
+  }
+  .city-tab .cmeta {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-top: 3px;
+    display: block;
+  }
+  .city-tab[aria-pressed="true"] {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .city-tab[aria-pressed="true"] .cmeta { color: rgba(251,247,238,0.65); }
+  .city-tab[aria-pressed="true"]::before {
+    content: "● NOW VIEWING";
+    position: absolute;
+    top: 10px; right: 12px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+  }
+
+  /* ---------- City header / progress ---------- */
+  .city-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+    margin: 46px 0 0;
+    padding-bottom: 18px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .city-head h2 {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 5vw, 3rem);
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1;
+  }
+  .city-head .sub {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-top: 8px;
+  }
+  .progress { min-width: 220px; flex: 1; max-width: 320px; }
+  .progress .plabel {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+  .progress .plabel b { color: var(--pine); }
+  .bar { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
+  .bar > span { display: block; height: 100%; background: var(--pine); border-radius: 99px; transition: width 0.5s ease; }
+
+  /* ---------- Controls ---------- */
+  .controls {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--paper);
+    padding: 16px 0 14px;
+    margin-top: 22px;
+    border-bottom: 1px solid var(--line);
+  }
+  .search-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .search {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--card);
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--r);
+    padding: 10px 14px;
+  }
+  .search:focus-within { border-color: var(--ink); }
+  .search input {
+    border: none;
+    background: transparent;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 14px;
+    width: 100%;
+    color: var(--ink);
+    outline: none;
+  }
+  .search .ic { color: var(--ink-soft); }
+
+  .seg { display: inline-flex; border: 1.5px solid var(--line-strong); border-radius: var(--r); overflow: hidden; }
+  .seg button {
+    appearance: none;
+    border: none;
+    background: var(--card);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    cursor: pointer;
+    color: var(--ink-soft);
+    border-right: 1.5px solid var(--line-strong);
+  }
+  .seg button:last-child { border-right: none; }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; align-items: center; }
+  .chips .glabel {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-right: 2px;
+  }
+  .chip {
+    appearance: none;
+    cursor: pointer;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    background: transparent;
+    border: 1.5px solid var(--line-strong);
+    color: var(--ink);
+    padding: 6px 12px;
+    border-radius: 99px;
+    transition: background 0.1s, color 0.1s, border-color 0.1s;
+  }
+  .chip:hover { border-color: var(--ink); }
+  .chip[aria-pressed="true"] { background: var(--tomato); border-color: var(--tomato); color: #fff; }
+
+  /* ---------- Result count ---------- */
+  .resbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin: 22px 0 14px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .resbar .clear { color: var(--tomato); cursor: pointer; background: none; border: none; font: inherit; text-transform: uppercase; }
+
+  /* ---------- Grid of tickets ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 18px;
+    padding-bottom: 80px;
+  }
+
+  .ticket {
+    position: relative;
+    background: var(--card);
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--r);
+    padding: 18px 18px 16px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    overflow: hidden;
+  }
+  .ticket::before {
+    /* perforation strip down the top */
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 46px;
+    height: 1px;
+    background-image: linear-gradient(to right, var(--line-strong) 60%, transparent 0);
+    background-size: 8px 1px;
+    background-repeat: repeat-x;
+  }
+  .ticket:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+
+  .t-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding-bottom: 16px;
+  }
+  .t-cuisine { color: var(--ink); font-weight: 700; }
+  .t-price { color: var(--gold); font-weight: 700; letter-spacing: 0.05em; }
+  .t-price .off { color: var(--line-strong); }
+
+  .t-name {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 700;
+    font-size: 1.42rem;
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    margin: 16px 0 0;
+  }
+
+  .t-order {
+    margin: 12px 0 0;
+    font-family: "Newsreader", serif;
+    font-size: 1.02rem;
+    line-height: 1.35;
+  }
+  .t-order .lead {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--tomato);
+    display: block;
+    margin-bottom: 2px;
+  }
+  .t-order .dish { font-style: italic; }
+  .t-order .dish.empty { color: var(--ink-soft); font-style: normal; }
+
+  .t-foot {
+    margin-top: auto;
+    padding-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+  }
+  .t-loc { color: var(--ink-soft); display: flex; align-items: center; gap: 5px; min-width: 0; }
+  .t-loc span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .t-yelp {
+    text-decoration: none;
+    color: var(--ink);
+    border: 1.5px solid var(--ink);
+    border-radius: 99px;
+    padding: 5px 12px;
+    white-space: nowrap;
+    transition: background 0.1s, color 0.1s;
+  }
+  .t-yelp:hover { background: var(--ink); color: var(--paper); }
+  .t-yelp.disabled { opacity: 0.4; pointer-events: none; }
+
+  .stamp {
+    position: absolute;
+    top: 54px;
+    right: 14px;
+    transform: rotate(-9deg);
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    padding: 4px 8px;
+    border: 2px solid;
+    border-radius: 4px;
+    pointer-events: none;
+    opacity: 0.92;
+  }
+  .stamp.tried { color: var(--pine); border-color: var(--pine); }
+  .stamp.want { color: var(--gold); border-color: var(--gold); transform: rotate(6deg); }
+
+  /* ---------- Empty ---------- */
+  .empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    border: 2px dashed var(--line-strong);
+    border-radius: var(--r);
+  }
+  .empty h3 { font-family: "Bricolage Grotesque", sans-serif; font-size: 1.5rem; margin: 0 0 6px; }
+  .empty p { color: var(--ink-soft); margin: 0; }
+
+  /* ---------- Footer ---------- */
+  footer {
+    border-top: 2px solid var(--ink);
+    padding: 28px 0 50px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    letter-spacing: 0.04em;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  footer b { color: var(--ink); }
+
+  @media (max-width: 720px) {
+    .cities { grid-template-columns: repeat(2, 1fr); }
+    .controls { position: static; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; scroll-behavior: auto; }
+  }
+
+  :focus-visible { outline: 3px solid var(--tomato); outline-offset: 2px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="masthead">
+      <div class="kicker">The List · A personal eating guide</div>
+      <h1 class="title">Where to eat in LA, SF, NY &amp; <em>Seattle</em>.</h1>
+      <p class="thesis">Not reviews — a hand-built hit-list of the exact dishes worth ordering.
+        <span class="soft">Pick a city, then chase the ones still stamped <b>“On the list.”</b></span></p>
+
+      <div class="cities" id="cities" role="tablist" aria-label="Choose a city"></div>
+    </header>
+
+    <main>
+      <section class="city-head">
+        <div>
+          <h2 id="cityTitle">—</h2>
+          <div class="sub" id="citySub">—</div>
+        </div>
+        <div class="progress">
+          <div class="plabel"><span>Eaten through</span><span><b id="progNum">0</b> <span id="progTot">/ 0</span></span></div>
+          <div class="bar"><span id="progBar" style="width:0%"></span></div>
+        </div>
+      </section>
+
+      <div class="controls">
+        <div class="search-row">
+          <label class="search">
+            <span class="ic mono">⌕</span>
+            <input id="search" type="search" placeholder="Search a place, dish, or neighborhood…" aria-label="Search" />
+          </label>
+          <div class="seg" role="group" aria-label="Filter by status">
+            <button data-status="all" aria-pressed="true">All</button>
+            <button data-status="want">On the list</button>
+            <button data-status="tried">Tried</button>
+          </div>
+        </div>
+        <div class="chips" id="chips"></div>
+      </div>
+
+      <div class="resbar">
+        <span id="resCount">—</span>
+        <button class="clear" id="clearBtn" hidden>Clear filters ✕</button>
+      </div>
+
+      <div class="grid" id="grid"></div>
+    </main>
+
+    <footer>
+      <span>The List · <b id="footTotal">—</b> spots across 4 cities</span>
+      <span>Built for friends who ask “where should I eat?”</span>
+    </footer>
+  </div>
+
+  <script src="data.js"></script>
+  <script>
+  (function () {
+    const DATA = (window.FOODIE_DATA && window.FOODIE_DATA.cities) || [];
+    const state = { city: DATA[0] && DATA[0].id, q: "", status: "all", cuisine: null, price: null };
+
+    const $ = (s) => document.querySelector(s);
+    const grid = $("#grid");
+    const cityById = (id) => DATA.find((c) => c.id === id);
+
+    function pricePips(p) {
+      const n = (p.match(/\$/g) || []).length || 0;
+      const max = 3;
+      let out = "";
+      for (let i = 0; i < max; i++) out += `<span class="${i < n ? "" : "off"}">$</span>`;
+      return n ? out : '<span class="off">$$$</span>';
+    }
+
+    function esc(s) {
+      return (s || "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    }
+
+    // ---- City tabs ----
+    function renderCities() {
+      const el = $("#cities");
+      el.innerHTML = DATA.map((c) => `
+        <button class="city-tab" role="tab" data-city="${c.id}" aria-pressed="${c.id === state.city}">
+          <span class="emoji">${c.emoji}</span>
+          <span class="cname">${esc(c.name)}</span>
+          <span class="cmeta">${c.count} spots · ${c.region}</span>
+        </button>`).join("");
+      el.querySelectorAll(".city-tab").forEach((b) =>
+        b.addEventListener("click", () => { setCity(b.dataset.city); }));
+    }
+
+    function setCity(id) {
+      state.city = id;
+      state.cuisine = null; state.price = null; state.q = ""; state.status = "all";
+      $("#search").value = "";
+      $$status("all");
+      document.querySelectorAll(".city-tab").forEach((b) =>
+        b.setAttribute("aria-pressed", b.dataset.city === id));
+      renderCityHead();
+      renderChips();
+      render();
+    }
+
+    function $$status(v) {
+      document.querySelectorAll(".seg [data-status]").forEach((b) =>
+        b.setAttribute("aria-pressed", b.dataset.status === v));
+    }
+
+    function renderCityHead() {
+      const c = cityById(state.city);
+      const tried = c.places.filter((p) => p.tried).length;
+      $("#cityTitle").textContent = `${c.emoji} ${c.name}`;
+      $("#citySub").textContent = `${c.region} · ${c.count} places on the list`;
+      $("#progNum").textContent = tried;
+      $("#progTot").textContent = `/ ${c.count}`;
+      $("#progBar").style.width = (c.count ? (tried / c.count) * 100 : 0) + "%";
+    }
+
+    // ---- Cuisine + price chips ----
+    function renderChips() {
+      const c = cityById(state.city);
+      const cuisines = [...new Set(c.places.map((p) => p.cuisine).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b));
+      const prices = [...new Set(c.places.map((p) => p.price).filter(Boolean))]
+        .sort((a, b) => a.length - b.length);
+
+      const chipBtn = (kind, val, label) =>
+        `<button class="chip" data-kind="${kind}" data-val="${esc(val)}" aria-pressed="false">${esc(label)}</button>`;
+
+      $("#chips").innerHTML =
+        `<span class="glabel">Cuisine</span>` +
+        cuisines.map((cu) => chipBtn("cuisine", cu, cu)).join("") +
+        `<span class="glabel" style="margin-left:8px">Price</span>` +
+        prices.map((pr) => chipBtn("price", pr, pr)).join("");
+
+      $("#chips").querySelectorAll(".chip").forEach((b) =>
+        b.addEventListener("click", () => {
+          const k = b.dataset.kind, v = b.dataset.val;
+          state[k] = state[k] === v ? null : v;
+          syncChips();
+          render();
+        }));
+    }
+
+    function syncChips() {
+      $("#chips").querySelectorAll(".chip").forEach((b) =>
+        b.setAttribute("aria-pressed", state[b.dataset.kind] === b.dataset.val));
+    }
+
+    // ---- Filtering + render ----
+    function filtered() {
+      const c = cityById(state.city);
+      const q = state.q.trim().toLowerCase();
+      return c.places.filter((p) => {
+        if (state.status === "tried" && !p.tried) return false;
+        if (state.status === "want" && p.tried) return false;
+        if (state.cuisine && p.cuisine !== state.cuisine) return false;
+        if (state.price && p.price !== state.price) return false;
+        if (q) {
+          const hay = `${p.name} ${p.description} ${p.cuisine} ${p.location}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+    }
+
+    function card(p) {
+      const stamp = p.tried
+        ? `<div class="stamp tried">✓ Tried</div>`
+        : `<div class="stamp want">○ On the list</div>`;
+      const dish = p.description
+        ? `<span class="dish">${esc(p.description)}</span>`
+        : `<span class="dish empty">Chef’s choice — anything goes</span>`;
+      const yelp = p.yelp
+        ? `<a class="t-yelp" href="${esc(p.yelp)}" target="_blank" rel="noopener">Yelp ↗</a>`
+        : `<span class="t-yelp disabled">No link</span>`;
+      const loc = p.location ? `<div class="t-loc">⌖ <span>${esc(p.location)}</span></div>` : `<div class="t-loc"></div>`;
+      return `
+        <article class="ticket">
+          ${stamp}
+          <div class="t-top">
+            <span class="t-cuisine">${esc(p.cuisine)}</span>
+            <span class="t-price">${pricePips(p.price)}</span>
+          </div>
+          <h3 class="t-name">${esc(p.name)}</h3>
+          <p class="t-order"><span class="lead">▸ ORDER</span>${dish}</p>
+          <div class="t-foot">
+            ${loc}
+            ${yelp}
+          </div>
+        </article>`;
+    }
+
+    function render() {
+      const list = filtered();
+      const c = cityById(state.city);
+      grid.innerHTML = list.length
+        ? list.map(card).join("")
+        : `<div class="empty"><h3>Nothing matches yet</h3><p>Loosen a filter or clear your search to see more of ${esc(c.name)}.</p></div>`;
+
+      const anyFilter = state.q || state.status !== "all" || state.cuisine || state.price;
+      $("#resCount").textContent =
+        `Showing ${list.length} of ${c.count}` + (anyFilter ? " · filtered" : "");
+      $("#clearBtn").hidden = !anyFilter;
+    }
+
+    function clearAll() {
+      state.q = ""; state.status = "all"; state.cuisine = null; state.price = null;
+      $("#search").value = "";
+      $$status("all");
+      syncChips();
+      render();
+    }
+
+    // ---- Wire up ----
+    $("#search").addEventListener("input", (e) => { state.q = e.target.value; render(); });
+    document.querySelectorAll(".seg [data-status]").forEach((b) =>
+      b.addEventListener("click", () => { state.status = b.dataset.status; $$status(state.status); render(); }));
+    $("#clearBtn").addEventListener("click", clearAll);
+
+    // ---- Boot ----
+    if (!DATA.length) {
+      grid.innerHTML = `<div class="empty"><h3>No data loaded</h3><p>Run <code>node build.js</code> to generate app/data.js, then refresh.</p></div>`;
+    } else {
+      $("#footTotal").textContent = DATA.reduce((n, c) => n + c.count, 0);
+      renderCities();
+      renderCityHead();
+      renderChips();
+      render();
+    }
+  })();
+  </script>
+</body>
+</html>

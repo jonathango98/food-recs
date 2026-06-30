@@ -1,0 +1,42 @@
+,,,,,,,
+,TRIED,Name,Cuisine,Description,Location,Price,Yelp
+,TRUE,Porto's Bakery,Bakery,Cheese Rolls,Los Angeles,$,https://www.yelp.com/biz/portos-bakery-and-cafe-glendale?osq=portos
+,FALSE,Blu Jam Cafe,Brunch,French Toast,Los Angeles,$$,https://www.yelp.com/biz/blu-jam-cafe-los-angeles-4
+,TRUE,Millet Crepes,Dessert,Crepes,Los Angeles,$,https://www.yelp.com/biz/millet-crepe-los-angeles
+,TRUE,Magnolia,Dessert,Banana Bread Pudding,Los Angeles,$,https://www.yelp.com/biz/magnolia-bakery-los-angeles-los-angeles
+,TRUE,Sprinkles Cupcake,Dessert,Cupcakes,Los Angeles,$,https://www.yelp.com/biz/sprinkles-the-grove-los-angeles?osq=Sprinkles+Cupcakes
+,TRUE,Go Greek Yogurt,Dessert,Greek Yogurt,Los Angeles,$,https://www.yelp.com/biz/go-greek-yogurt-beverly-hills?osq=Go+Greek+Yogurt
+,TRUE,Salt & Straw,Dessert,Ice Cream,Los Angeles,$,https://www.yelp.com/biz/salt-and-straw-los-angeles-9
+,TRUE,Borneo,Indonesian,Indo Noodle,Los Angeles,$$,https://www.yelp.com/biz/borneo-kalimantan-cuisine-alhambra-2
+,TRUE,Medan Kitchen,Indonesian,Medanese Food,Los Angeles,$$,https://www.yelp.com/biz/medan-kitchen-rosemead-2
+,FALSE,Uovo,Italian,Pasta,Los Angeles,$$,https://www.yelp.com/biz/uovo-pasadena-pasadena
+,FALSE,Sparrow,Italian,Pasta,Los Angeles,$$$,https://www.yelp.com/biz/sparrow-italia-los-angeles
+,FALSE,Fritto Misto,Italian,Pasta,Los Angeles,$$$,https://www.yelp.com/biz/fritto-misto-santa-monica-2
+,FALSE,Pomodoro Trattoria,Itallian,Pasta,Los Angeles,$$,https://www.yelp.com/biz/pomodoro-trattoria-los-angeles-2
+,TRUE,Tsujita LA,Japanese,Tsukemen,Los Angeles,$$,https://www.yelp.com/biz/tsujita-la-artisan-noodle-los-angeles-2
+,TRUE,Tatsu Ramen,Japanese,Naked Ramen,Los Angeles,$$,https://www.yelp.com/biz/tatsu-ramen-los-angeles-4
+,TRUE,Kazunori Handroll,Japanese,Sushi Handroll,Los Angeles,$$$,https://www.yelp.com/biz/kazunori-dtla-los-angeles
+,TRUE,Marugame Monzo,Japanese,Udon,Los Angeles,$$,https://www.yelp.com/biz/marugame-monzo-los-angeles-5
+,FALSE,Sugarfish,Japanese,Sushi,Los Angeles,$$$,https://www.yelp.com/biz/sugarfish-downtown-la-los-angeles?osq=sugarfish
+,FALSE,Tokyo Kalbi,Japanese,JBBQ,Los Angeles,$$$,https://www.yelp.com/biz/tokyo-kalbi-los-angeles-2
+,TRUE,Red Rock,Japanese,American Sliced Beef Don,Los Angeles,$$,https://www.yelp.com/biz/red-rock-torrance-torrance-9
+,FALSE,Kochi,Japanese,,Los Angeles,$$,https://www.yelp.com/biz/kochi-west-hollywood
+,FALSE,Kinjiro,Japanese,Izakaya,Los Angeles,$$$$,https://www.yelp.com/biz/kinjiro-los-angeles-2
+,TRUE,Yup Dduk LA,Korean,Tteokbokki,Los Angeles,$$,https://www.yelp.com/biz/yup-dduk-la-los-angeles
+,TRUE,Kang Ho Dong Baekjong,Korean,KBBQ,Los Angeles,$$$,https://www.yelp.com/biz_photos/baekjeong-los-angeles
+,FALSE,Quarters,Korean,KBBQ,Los Angeles,$$$,https://www.yelp.com/biz/quarters-korean-bbq-los-angeles
+,TRUE,Jinsol Gukbap,Korean,Pork Belly Slices & Bone Broth Soup,Los Angeles,$$,https://www.yelp.com/biz/jinsol-gukbap-la-los-angeles
+,TRUE,Han Bat Sul Lung Tang,Korean,Bone Broth Soup,Los Angeles,$,https://www.yelp.com/biz/han-bat-sul-lung-tang-los-angeles-2?osq=han+bat
+,TRUE,Sun Nong Dan,Korean,Kalbi Jjim,Los Angeles,$$,https://www.yelp.com/biz/sun-nong-dan-los-angeles-5?osq=Sun+Nong+Dan+San+Gabriel
+,FALSE,Zzamong,Korean,Jjajangmeon,Los Angeles,$,https://www.yelp.com/biz/zzamong-los-angeles
+,FALSE,Eight Korean BBQ,Korean,KBBQ,Los Angeles,$$$,https://www.yelp.com/biz/eight-korean-bbq-los-angeles-2
+,FALSE,Ma Dang Gook Soo,Korean,Cold Noodles,Los Angeles,$$,https://www.yelp.com/biz/ma-dang-gook-soo-los-angeles
+,TRUE,BCD Tofu House,Korean,Korean Tofu Soup,Los Angeles,$$,https://www.yelp.com/biz/bcd-tofu-house-los-angeles-2?osq=Bcd+Tofu+House
+,FALSE,Aki Shabu,Korean,Shabu2 AYCE,Los Angeles,$$$,https://www.yelp.com/biz/aki-shabu-ktown-los-angeles-2
+,FALSE,Raffi's Place,Mediterranean,Skewers,Los Angeles,$$$,https://www.yelp.com/biz/raffis-place-glendale-2
+,FALSE,Ammatoli,Mediterranean,Skewers,Los Angeles,$$$,https://www.yelp.com/biz/ammatoli-long-beach
+,TRUE,Pa Ord,Thai,Crispy Pork,Los Angeles,$$,https://www.yelp.com/biz/pa-ord-noodle-los-angeles-4
+,TRUE,Brodard,Vietnamese,Spring Roll,Orange County,$,https://www.yelp.com/biz/brodard-restaurant-fountain-valley
+,TRUE,Vox Kitchen,Vietnamese,Steak w/ Garlic Noodle,Orange County,$$,https://www.yelp.com/biz/vox-kitchen-fountain-valley-fountain-valley-18
+,FALSE,NEP Cafe,Vietnamese-French,,Los Angeles,$$,https://www.yelp.com/biz/nep-cafe-fountain-valley-76?osq=nep+cafe
+,TRUE,Howling Rays,Western,Spicy Chicken Sandwich,Los Angeles,$$,https://www.yelp.com/biz/howlin-rays-los-angeles-7
