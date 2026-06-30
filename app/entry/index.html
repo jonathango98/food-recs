@@ -59,6 +59,12 @@
   .field textarea { resize: vertical; min-height: 70px; }
   .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--tomato); }
   .field input:invalid:not(:placeholder-shown) { border-color: var(--tomato); }
+  .field label.check {
+    display: flex; align-items: center; gap: 8px; margin: 10px 0 0;
+    text-transform: none; letter-spacing: 0; font-size: 13px; color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .field label.check input { width: auto; accent-color: var(--tomato); cursor: pointer; }
   .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media (max-width: 520px) { .row2 { grid-template-columns: 1fr; } }
 
@@ -81,6 +87,8 @@
   .msg { margin-top: 16px; font-family: "JetBrains Mono", monospace; font-size: 13px; }
   .msg.err { color: var(--tomato); }
   .msg.ok { color: var(--pine); }
+  .hint { margin-top: 6px; min-height: 1em; font-family: "JetBrains Mono", monospace; font-size: 12px; line-height: 1.4; }
+  .hint.warn { color: #9a5b00; }
 
   .done {
     margin-top: 30px; background: var(--card); border: 1.5px solid var(--pine);
@@ -116,6 +124,7 @@
       <div class="field">
         <label for="name">Place name <span class="req">*</span></label>
         <input type="text" id="name" required placeholder="e.g. Sqirl" />
+        <div class="hint" id="dupHint" role="status"></div>
       </div>
 
       <div class="row2">
@@ -152,6 +161,10 @@
       <div class="field">
         <label for="by">Your name <span class="req">*</span></label>
         <input type="text" id="by" required placeholder="So we can credit / blame you" />
+        <label class="check" for="anon">
+          <input type="checkbox" id="anon" />
+          <span>I wish to not be added to the contributor list</span>
+        </label>
       </div>
 
       <div class="field">
@@ -187,6 +200,27 @@
 
     function val(id) { return $("#" + id).value.trim(); }
 
+    // Live "is this already on the list?" check on the place name + city.
+    const dupHint = $("#dupHint");
+    async function checkDuplicate() {
+      const city = $("#city").value, name = val("name");
+      dupHint.className = "hint"; dupHint.textContent = "";
+      if (!city || name.length < 2) return;
+      try {
+        const r = await fetch(API_BASE + "/api/entries/check?city=" +
+          encodeURIComponent(city) + "&name=" + encodeURIComponent(name));
+        const d = await r.json();
+        if (d.exists) {
+          dupHint.className = "hint warn";
+          dupHint.textContent = d.status === "approved"
+            ? `Heads up — looks like “${d.name}”${d.location ? " (" + d.location + ")" : ""} is already on the guide. Submit anyway if it's a different spot.`
+            : `Heads up — “${d.name}” looks like it's already in the review queue. Submit anyway if it's a different spot.`;
+        }
+      } catch (_) { /* check is best-effort; ignore network errors */ }
+    }
+    $("#name").addEventListener("blur", checkDuplicate);
+    $("#city").addEventListener("change", checkDuplicate);
+
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       msg.className = "msg";
@@ -196,6 +230,7 @@
         city: $("#city").value, name: val("name"), cuisine: val("cuisine"),
         description: val("desc"), location: val("loc"), price,
         yelp: val("yelp"), submitted_by: val("by"), note: val("note"),
+        anonymous: $("#anon").checked,
       };
 
       submit.disabled = true; msg.textContent = "Sending…";
@@ -219,6 +254,7 @@
     $("#again").addEventListener("click", () => {
       form.reset(); price = "";
       $("#price").querySelectorAll("[data-price]").forEach((x) => x.setAttribute("aria-pressed", "false"));
+      dupHint.className = "hint"; dupHint.textContent = "";
       msg.textContent = ""; form.hidden = false; $("#done").hidden = true;
       window.scrollTo({ top: 0, behavior: "smooth" });
     });

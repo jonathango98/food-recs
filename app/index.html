@@ -105,6 +105,13 @@
   .contribute:hover { transform: translateY(-2px); filter: brightness(1.05); }
   .contribute:hover .arrow { transform: translateX(3px); }
 
+  /* Secondary, ghost-style sibling of the contribute button. */
+  .contribute.secondary { color: var(--ink); background: transparent; border-color: var(--line-strong); }
+  .contribute.secondary:hover { filter: none; border-color: var(--ink); }
+
+  .cta-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 22px 0 0; }
+  .cta-row .contribute { margin: 0; }
+
   /* ---------- City tabs ---------- */
   .cities {
     display: grid;
@@ -450,7 +457,10 @@
       <p class="thesis">Not reviews — a hand-built hit-list of the exact dishes worth ordering.
         <span class="soft">Pick a city, then chase the ones still stamped <b>“On the list.”</b></span></p>
 
-      <a class="contribute" href="entry/">Wanna contribute? <span class="arrow">→</span></a>
+      <div class="cta-row">
+        <a class="contribute" href="entry/">Wanna contribute? <span class="arrow">→</span></a>
+        <a class="contribute secondary" href="contributors/">Meet the contributors <span class="arrow">→</span></a>
+      </div>
 
       <div class="cities" id="cities" role="tablist" aria-label="Choose a city"></div>
     </header>
@@ -492,7 +502,7 @@
 
     <footer>
       <span>The List · <b id="footTotal">—</b> spots across 4 cities</span>
-      <span>Built for friends who ask “where should I eat?”</span>
+      <span><a href="contributors/">Contributors</a> · Built for friends who ask “where should I eat?”</span>
     </footer>
   </div>
 

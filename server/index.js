@@ -7,7 +7,8 @@
 require('./env');
 const path = require('path');
 const express = require('express');
-const { pool, init } = require('./db');
+const db = require('./db');
+const { pool, init } = db;
 const { seedIfEmpty } = require('./seed');
 const { CITY_META, ORDER } = require('../build');
 
@@ -56,6 +57,65 @@ function requireAdmin(req, res, next) {
 const VALID_CITIES = new Set(['la', 'sf', 'ny', 'sea']);
 const str = (v, max = 500) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 
+// The original crew, already in {first}.{last initial} form. Public submitters
+// join this roster (once their entry is approved) below.
+const FOUNDERS = ['jonathan.g', 'sharon.g', 'euginia.w', 'jeremy.t', 'joshua.r'];
+
+// Turn a free-form "submitted_by" into a {first}.{last initial} handle.
+//   "Jane Doe" -> "jane.d" ; "Cher" -> "cher" ; "Mary Jane Watson" -> "mary.w"
+function contributorHandle(name) {
+  const parts = String(name || '')
+    .toLowerCase()
+    .replace(/[^a-z\s'-]/g, '')
+    .split(/\s+/)
+    .filter(Boolean);
+  if (!parts.length) return '';
+  const first = parts[0];
+  const last = parts.length > 1 ? parts[parts.length - 1] : '';
+  return last ? `${first}.${last[0]}` : first;
+}
+
+// How similar two names must be to count as the same place (0–1). Higher = stricter.
+const DUP_THRESHOLD = 0.4;
+
+// Find an existing place in the same city that looks like `name`, ignoring rejected
+// ones. Uses pg_trgm fuzzy matching (catches typos / "Cafe" / "LA" variants) when the
+// extension is available, otherwise falls back to exact case-insensitive matching.
+// Prefers an approved match (already on the guide) over a still-pending one.
+function findDuplicate(city, name) {
+  if (db.hasTrgm) {
+    return pool.query(
+      `SELECT name, location, status FROM entries
+         WHERE city = $1 AND status <> 'rejected' AND similarity(name, $2) > $3
+         ORDER BY (status = 'approved') DESC, similarity(name, $2) DESC
+         LIMIT 1`,
+      [city, name, DUP_THRESHOLD]
+    );
+  }
+  return pool.query(
+    `SELECT name, location, status FROM entries
+       WHERE city = $1 AND lower(name) = lower($2) AND status <> 'rejected'
+       ORDER BY (status = 'approved') DESC
+       LIMIT 1`,
+    [city, name]
+  );
+}
+
+// --- Public: has this place already been suggested / added? ---
+app.get('/api/entries/check', async (req, res) => {
+  try {
+    const city = str(req.query.city, 8);
+    const name = str(req.query.name, 200);
+    if (!VALID_CITIES.has(city) || !name) return res.json({ exists: false });
+    const { rows } = await findDuplicate(city, name);
+    if (!rows.length) return res.json({ exists: false });
+    res.json({ exists: true, status: rows[0].status, name: rows[0].name, location: rows[0].location });
+  } catch (err) {
+    console.error('GET /api/entries/check', err);
+    res.json({ exists: false });
+  }
+});
+
 // --- Public: submit a recommendation (all fields required) ---
 app.post('/api/entries', async (req, res) => {
   try {
@@ -72,6 +132,7 @@ app.post('/api/entries', async (req, res) => {
       yelp: str(b.yelp, 500),
       submitted_by: str(b.submitted_by, 120),
       note: str(b.note, 500),
+      anonymous: b.anonymous === true,
     };
 
     if (!VALID_CITIES.has(row.city)) return res.status(400).json({ error: 'Pick a valid city.' });
@@ -81,17 +142,21 @@ app.post('/api/entries', async (req, res) => {
     if (missing.length) return res.status(400).json({ error: `Missing required field(s): ${missing.join(', ')}.` });
     if (!/^https?:\/\//i.test(row.yelp)) return res.status(400).json({ error: 'Yelp must be a valid URL.' });
 
+    // Note: possible duplicates are surfaced to the submitter as a warning via
+    // GET /api/entries/check, not blocked here — fuzzy matching can false-positive,
+    // and the admin review queue is the backstop.
+
     // Public submissions are always pending. Admin may set tried / approve directly.
     const tried = admin ? b.tried === true : false;
     const status = admin && b.status === 'approved' ? 'approved' : 'pending';
 
     const { rows } = await pool.query(
       `INSERT INTO entries
-         (city, name, cuisine, description, location, price, yelp, tried, status, submitted_by, note, reviewed_at)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11, CASE WHEN $9 = 'approved' THEN now() ELSE NULL END)
+         (city, name, cuisine, description, location, price, yelp, tried, status, submitted_by, note, anonymous, reviewed_at)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12, CASE WHEN $9 = 'approved' THEN now() ELSE NULL END)
        RETURNING id, created_at`,
       [row.city, row.name, row.cuisine, row.description, row.location,
-       row.price, row.yelp, tried, status, row.submitted_by, row.note]
+       row.price, row.yelp, tried, status, row.submitted_by, row.note, row.anonymous]
     );
     res.status(201).json({ ok: true, id: rows[0].id });
   } catch (err) {
@@ -123,6 +188,30 @@ app.get('/api/places', async (req, res) => {
   } catch (err) {
     console.error('GET /api/places', err);
     res.status(500).json({ error: 'Could not load the guide.' });
+  }
+});
+
+// --- Public: contributors (founders + everyone whose entry made the guide) ---
+app.get('/api/contributors', async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT submitted_by, MIN(created_at) AS first_at
+         FROM entries
+        WHERE status = 'approved' AND anonymous = FALSE
+          AND submitted_by IS NOT NULL AND submitted_by NOT IN ('', 'seed')
+        GROUP BY submitted_by
+        ORDER BY first_at ASC`
+    );
+    const contributors = [...FOUNDERS];
+    for (const r of rows) {
+      const handle = contributorHandle(r.submitted_by);
+      if (handle && !contributors.includes(handle)) contributors.push(handle);
+    }
+    res.set('Cache-Control', 'no-store');
+    res.json({ contributors });
+  } catch (err) {
+    console.error('GET /api/contributors', err);
+    res.json({ contributors: FOUNDERS });
   }
 });
 
