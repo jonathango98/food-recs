@@ -391,7 +391,6 @@
     margin-bottom: 2px;
   }
   .t-order .dish { font-style: italic; }
-  .t-order .dish.empty { color: var(--ink-soft); font-style: normal; }
 
   .t-foot {
     margin-top: auto;
@@ -645,7 +644,7 @@
       const status = p.tried ? "tried" : "want";
       const dish = p.description
         ? `<span class="dish">${esc(p.description)}</span>`
-        : `<span class="dish empty">Chef’s choice — anything goes</span>`;
+        : `<span class="dish">Chef’s choice — anything goes</span>`;
       const yelp = p.yelp
         ? `<a class="t-yelp" href="${esc(p.yelp)}" target="_blank" rel="noopener" aria-label="View ${esc(p.name)} on Yelp">${YELP_SVG}</a>`
         : `<span class="t-yelp disabled" aria-label="No Yelp link">${YELP_SVG}</span>`;
