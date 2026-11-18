@@ -5,525 +5,138 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>The List — Where to eat in LA, SF, NY &amp; Seattle</title>
 <meta name="description" content="A hand-built guide to the exact dishes to order in Los Angeles, San Francisco, New York and Seattle." />
+<meta name="theme-color" content="#C8102E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="menu.css" />
 <style>
-  :root {
-    --paper: #FBF7EE;
-    --card: #FFFDF8;
-    --ink: #1E1B17;
-    --ink-soft: #756B5F;
-    --line: #E6DCCB;
-    --line-strong: #D6C9B2;
-    --tomato: #D8412F;
-    --pine: #176B5C;
-    --gold: #E8A33D;
-    --shadow: 14px 16px 0 rgba(30, 27, 23, 0.06);
-    --r: 4px;
-  }
-
-  * { box-sizing: border-box; }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    margin: 0;
-    background-color: var(--paper);
-    background-image: radial-gradient(rgba(30,27,23,0.035) 1px, transparent 1px);
-    background-size: 22px 22px;
-    color: var(--ink);
-    font-family: "Newsreader", Georgia, serif;
-    font-size: 17px;
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
-
-  a { color: var(--tomato); text-underline-offset: 3px; }
-
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
-
   /* ---------- Masthead ---------- */
-  header.masthead { padding: 40px 0 8px; }
-
-  .kicker {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--tomato);
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  .band-in { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; padding-top: 20px; padding-bottom: 18px; }
+  .tagline { margin: 10px 0 0; font-size: 1rem; line-height: 1.35; color: #FFE3E6; max-width: 34ch; }
+  .band-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex: none; }
+  @media (max-width: 520px) {
+    .band-in { flex-direction: column; align-items: stretch; gap: 14px; }
+    .band-actions { flex-direction: row; align-items: center; justify-content: space-between; }
   }
-  .kicker::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: var(--line-strong);
-  }
-
-  h1.title {
-    font-family: "Bricolage Grotesque", sans-serif;
-    font-weight: 800;
-    font-size: clamp(2.6rem, 7vw, 5.2rem);
-    line-height: 0.95;
-    letter-spacing: -0.02em;
-    margin: 18px 0 0;
-    max-width: 16ch;
-  }
-  h1.title em { font-style: normal; color: var(--tomato); }
-
-  .thesis {
-    margin: 20px 0 0;
-    font-size: clamp(1.05rem, 2vw, 1.3rem);
-    max-width: 56ch;
-    color: var(--ink);
-  }
-  .thesis .soft { color: var(--ink-soft); }
-
-  .contribute {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin: 22px 0 0;
-    font-family: "Bricolage Grotesque", sans-serif;
-    font-weight: 700;
-    font-size: 1rem;
-    text-decoration: none;
-    color: #fff;
-    background: var(--tomato);
-    border: 1.5px solid var(--tomato);
-    border-radius: var(--r);
-    padding: 11px 18px;
-    box-shadow: var(--shadow);
-    transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
-  }
-  .contribute .arrow { transition: transform 0.12s ease; }
-  .contribute:hover { transform: translateY(-2px); filter: brightness(1.05); }
-  .contribute:hover .arrow { transform: translateX(3px); }
-
-  /* Secondary, ghost-style sibling of the contribute button. */
-  .contribute.secondary { color: var(--ink); background: transparent; border-color: var(--line-strong); }
-  .contribute.secondary:hover { filter: none; border-color: var(--ink); }
-
-  .cta-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 22px 0 0; }
-  .cta-row .contribute { margin: 0; }
+  .band-actions .link { color: #fff; font-weight: 600; font-size: .95rem; }
 
   /* ---------- City tabs ---------- */
-  .cities {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin: 34px 0 0;
+  .tabs-wrap { position: sticky; top: 0; z-index: 5; background: var(--paper); border-bottom: 2px solid var(--red); }
+  .tabs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex: none; appearance: none; background: none; border: 0; cursor: pointer;
+    font: 700 1.05rem/1 var(--sans); font-variation-settings: "wdth" 80;
+    color: var(--soft); padding: 14px 12px 12px; display: flex; align-items: baseline; gap: 6px;
   }
-  .city-tab {
-    appearance: none;
-    text-align: left;
-    cursor: pointer;
-    background: var(--card);
-    border: 1.5px solid var(--line-strong);
-    border-radius: var(--r);
-    padding: 16px 16px 14px;
-    transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
-    font-family: inherit;
-    color: inherit;
-    position: relative;
-    overflow: hidden;
-  }
-  .city-tab:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
-  .city-tab .emoji { font-size: 26px; line-height: 1; display: block; }
-  .city-tab .cname {
-    font-family: "Bricolage Grotesque", sans-serif;
-    font-weight: 700;
-    font-size: 1.35rem;
-    letter-spacing: -0.01em;
-    margin-top: 10px;
-    display: block;
-  }
-  .city-tab .cmeta {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    margin-top: 3px;
-    display: block;
-  }
-  .city-tab[aria-pressed="true"] {
-    border-color: var(--ink);
-    background: var(--ink);
-    color: var(--paper);
-  }
-  .city-tab[aria-pressed="true"] .cmeta { color: rgba(251,247,238,0.65); }
-  .city-tab[aria-pressed="true"]::before {
-    content: "● NOW VIEWING";
-    position: absolute;
-    top: 10px; right: 12px;
-    font-family: "JetBrains Mono", monospace;
-    font-size: 9px;
-    letter-spacing: 0.12em;
-    color: var(--gold);
-  }
+  .tab:first-child { padding-left: 0; }
+  .tab .n { font-weight: 500; font-size: .85rem; font-variant-numeric: tabular-nums; }
+  .tab:hover { color: var(--ink); }
+  .tab .short { display: none; }
+  @media (max-width: 520px) { .tab .full { display: none; } .tab .short { display: inline; } .tabs { justify-content: space-between; } }
+  .tab[aria-selected="true"] { color: var(--red); box-shadow: inset 0 -4px 0 var(--red); }
 
-  /* ---------- City header / progress ---------- */
-  .city-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 18px;
-    margin: 46px 0 0;
-    padding-bottom: 18px;
-    border-bottom: 2px solid var(--ink);
-  }
-  .city-head h2 {
-    font-family: "Bricolage Grotesque", sans-serif;
-    font-weight: 800;
-    font-size: clamp(2rem, 5vw, 3rem);
-    letter-spacing: -0.02em;
-    margin: 0;
-    line-height: 1;
-  }
-  .city-head .sub {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    margin-top: 8px;
-  }
-  .progress { min-width: 220px; flex: 1; max-width: 320px; }
-  .progress .plabel {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    display: flex;
-    justify-content: space-between;
-    color: var(--ink-soft);
-    margin-bottom: 6px;
-  }
-  .progress .plabel b { color: var(--pine); }
-  .bar { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
-  .bar > span { display: block; height: 100%; background: var(--pine); border-radius: 99px; transition: width 0.5s ease; }
-
-  /* ---------- Controls ---------- */
-  .controls {
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    background: var(--paper);
-    padding: 16px 0 14px;
-    margin-top: 22px;
-    border-bottom: 1px solid var(--line);
-  }
-  .search-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-  .search {
-    flex: 1;
-    min-width: 200px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--card);
-    border: 1.5px solid var(--line-strong);
-    border-radius: var(--r);
-    padding: 10px 14px;
-  }
-  .search:focus-within { border-color: var(--ink); }
+  /* ---------- Tools ---------- */
+  .tools { padding-top: 14px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .search { position: relative; display: block; }
+  .search svg { position: absolute; left: 14px; top: 50%; width: 18px; height: 18px; transform: translateY(-50%); color: var(--soft); pointer-events: none; }
   .search input {
-    border: none;
-    background: transparent;
-    font-family: "JetBrains Mono", monospace;
-    font-size: 14px;
-    width: 100%;
-    color: var(--ink);
-    outline: none;
+    width: 100%; height: 46px; padding: 0 14px 0 42px; font: 400 1rem var(--sans);
+    color: var(--ink); background: #fff; border: 1.5px solid var(--ink); border-radius: 8px;
   }
-  .search .ic { color: var(--ink-soft); display: flex; }
-  .search .ic svg { width: 16px; height: 16px; display: block; }
+  .search input::placeholder { color: var(--soft); }
+  .search input:focus-visible { outline: 2px solid var(--pen); outline-offset: 2px; }
 
-  .seg { display: inline-flex; border: 1.5px solid var(--line-strong); border-radius: var(--r); overflow: hidden; }
-  .seg button {
-    appearance: none;
-    border: none;
-    background: var(--card);
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    padding: 10px 14px;
-    cursor: pointer;
-    color: var(--ink-soft);
-    border-right: 1.5px solid var(--line-strong);
-  }
-  .seg button:last-child { border-right: none; }
-  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+  .chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 2px 16px; }
+  .chips::-webkit-scrollbar { display: none; }
+  @media (min-width: 760px) { .chips { flex-wrap: wrap; overflow: visible; margin: 0; padding: 2px 0; } }
+  .chips .sep { flex: none; width: 1.5px; background: var(--rule); margin: 4px 4px; }
 
-  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; align-items: center; }
-  .chips .glabel {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    margin-right: 2px;
-  }
-  .chip {
-    appearance: none;
-    cursor: pointer;
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    background: transparent;
-    border: 1.5px solid var(--line-strong);
-    color: var(--ink);
-    padding: 6px 12px;
-    border-radius: 99px;
-    transition: background 0.1s, color 0.1s, border-color 0.1s;
-  }
-  .chip:hover { border-color: var(--ink); }
-  .chip[aria-pressed="true"] { background: var(--tomato); border-color: var(--tomato); color: #fff; }
+  .tally { display: flex; align-items: center; gap: 12px; font-size: .95rem; color: var(--soft); font-variant-numeric: tabular-nums; }
+  .tally b { color: var(--ink); font-weight: 700; }
+  .tally .bar { flex: 1; max-width: 220px; height: 4px; background: var(--rule); border-radius: 2px; overflow: hidden; }
+  .tally .bar span { display: block; height: 100%; background: var(--red); transition: width .5s cubic-bezier(.16,1,.3,1); }
+  .tally .key { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .tally .key svg { width: 30px; height: 24px; overflow: visible; }
+  .clear { appearance: none; background: none; border: 0; padding: 0; cursor: pointer; font: 600 .95rem var(--sans); color: var(--red); text-decoration: underline; text-underline-offset: 3px; }
 
-  /* ---------- Result count + legend ---------- */
-  .resbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-    margin: 22px 0 14px;
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-  }
-  .resbar .clear { color: var(--tomato); cursor: pointer; background: none; border: none; font: inherit; text-transform: uppercase; }
+  /* ---------- Menu ---------- */
+  .menu { padding: 6px 0 40px; }
+  @media (min-width: 760px) { .menu { columns: 2 340px; column-gap: 56px; column-rule: 1.5px dotted var(--rule); } }
+  @media (min-width: 1100px) { .menu { columns: 3 300px; } }
 
-  /* Shared status dot — reused in the legend and on every card. */
-  .dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    display: inline-block;
-    flex: none;
+  .sec h2 {
+    margin: 22px 0 2px; color: var(--red);
+    font: 900 2rem/1 var(--sans); font-variation-settings: "wdth" 62; text-transform: uppercase; letter-spacing: .01em;
+    break-after: avoid;
   }
-  .dot.tried { background: var(--pine); }
-  .dot.want { background: transparent; box-shadow: inset 0 0 0 2px var(--gold); }
+  .sec h2 .ct { font-size: .5em; font-weight: 600; font-variation-settings: "wdth" 100; color: var(--soft); margin-left: 6px; vertical-align: .35em; letter-spacing: 0; text-transform: none; }
+  .sec { break-inside: avoid-column; }
+  .sec:first-child h2 { margin-top: 16px; }
 
-  .legend {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-left: auto;
-  }
-  .legend .lg { display: inline-flex; align-items: center; gap: 7px; }
-  .resbar .clear { order: 3; }
+  .it { display: grid; grid-template-columns: 40px 1fr auto; column-gap: 6px; align-items: last baseline; padding: 9px 0; break-inside: avoid; }
+  .no { align-self: start; position: relative; font: 800 1.05rem/calc(1.2rem * 1.15) var(--sans); text-align: center; font-variant-numeric: tabular-nums; }
+  .no svg { position: absolute; left: 50%; top: 50%; width: 44px; height: 36px; transform: translate(-50%, -54%); overflow: visible; pointer-events: none; }
+  .no path, .key path { fill: none; stroke: var(--pen); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 160; stroke-dashoffset: 0; }
+  .menu.draw .no path { animation: pen .55s cubic-bezier(.3,.1,.2,1) both; animation-delay: var(--d, 0s); }
+  @keyframes pen { from { stroke-dashoffset: 160; } }
+  .dish { margin: 0; font: 700 1.2rem/1.15 var(--sans); min-width: 0; overflow: clip; }
+  /* Dot leader runs from the dish's last word to the price, clipped at the column edge. */
+  .dish::after { content: "\00a0 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ."; display: inline-block; width: 0; white-space: nowrap; color: #BFB0AA; font-weight: 600; letter-spacing: .08em; }
+  .pr { font: 700 1.05rem/1 var(--sans); font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+  .pl { grid-column: 2 / 4; margin-top: 3px; font-size: .95rem; color: var(--soft); display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; }
+  .pl a { color: var(--ink); font-weight: 600; text-decoration-color: var(--rule); display: inline-flex; align-items: center; gap: 5px; }
+  .pl a:hover { text-decoration-color: var(--red); }
+  .pl a svg { width: 14px; height: 14px; color: var(--red); flex: none; }
+  .pl .nm { color: var(--ink); font-weight: 600; }
 
-  /* ---------- Grid of tickets ---------- */
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-    gap: 18px;
-    padding-bottom: 80px;
-  }
-
-  .ticket {
-    position: relative;
-    background: var(--card);
-    border: 1.5px solid var(--line-strong);
-    border-radius: var(--r);
-    padding: 18px 18px 16px;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.12s ease, box-shadow 0.12s ease;
-    overflow: hidden;
-  }
-  .ticket::before {
-    /* perforation strip down the top */
-    content: "";
-    position: absolute;
-    left: 0; right: 0; top: 46px;
-    height: 1px;
-    background-image: linear-gradient(to right, var(--line-strong) 60%, transparent 0);
-    background-size: 8px 1px;
-    background-repeat: repeat-x;
-  }
-  .ticket:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
-
-  .t-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: "JetBrains Mono", monospace;
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    padding-bottom: 16px;
-  }
-  .t-lead { display: flex; align-items: center; gap: 9px; min-width: 0; }
-  .t-cuisine { color: var(--ink); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .t-price { color: var(--gold); font-weight: 700; letter-spacing: 0.05em; }
-  .t-price .off { color: var(--line-strong); }
-
-  .t-name {
-    font-family: "Bricolage Grotesque", sans-serif;
-    font-weight: 700;
-    font-size: 1.42rem;
-    line-height: 1.08;
-    letter-spacing: -0.01em;
-    margin: 16px 0 0;
-  }
-
-  .t-order {
-    margin: 12px 0 0;
-    font-family: "Newsreader", serif;
-    font-size: 1.02rem;
-    line-height: 1.35;
-  }
-  .t-order .lead {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    color: var(--tomato);
-    display: block;
-    margin-bottom: 2px;
-  }
-  .t-order .dish { font-style: italic; }
-
-  .t-foot {
-    margin-top: auto;
-    padding-top: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-  }
-  .t-loc { color: var(--ink-soft); display: flex; align-items: center; gap: 6px; min-width: 0; }
-  .t-loc span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .t-loc svg { width: 13px; height: 13px; flex: none; opacity: 0.75; }
-
-  /* Yelp link: brand burst mark, no wordmark. */
-  .t-yelp {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    text-decoration: none;
-    color: var(--ink-soft);
-    border: 1.5px solid var(--line-strong);
-    border-radius: 99px;
-    padding: 5px 11px;
-    white-space: nowrap;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    transition: border-color 0.12s, color 0.12s, background 0.12s;
-  }
-  .t-yelp svg { width: 14px; height: 14px; display: block; fill: #D32323; flex: none; }
-  .t-yelp:hover { border-color: #D32323; color: var(--ink); background: rgba(211,35,35,0.06); }
-  .t-yelp.disabled { opacity: 0.4; pointer-events: none; }
-  .t-yelp.disabled svg { fill: var(--ink-soft); }
-
-  /* ---------- Empty ---------- */
-  .empty {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 60px 20px;
-    border: 2px dashed var(--line-strong);
-    border-radius: var(--r);
-  }
-  .empty h3 { font-family: "Bricolage Grotesque", sans-serif; font-size: 1.5rem; margin: 0 0 6px; }
-  .empty p { color: var(--ink-soft); margin: 0; }
-
-  /* ---------- Footer ---------- */
-  footer {
-    border-top: 2px solid var(--ink);
-    padding: 28px 0 50px;
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    color: var(--ink-soft);
-    letter-spacing: 0.04em;
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  footer b { color: var(--ink); }
-
-  @media (max-width: 720px) {
-    .cities { grid-template-columns: repeat(2, 1fr); }
-    .controls { position: static; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    * { transition: none !important; scroll-behavior: auto; }
-  }
-
-  :focus-visible { outline: 3px solid var(--tomato); outline-offset: 2px; }
+  .empty { padding: 40px 0 60px; }
+  .empty h2 { font: 900 2rem/1 var(--sans); font-variation-settings: "wdth" 62; color: var(--red); text-transform: uppercase; margin: 0 0 8px; }
+  .empty p { margin: 0 0 14px; color: var(--soft); max-width: 46ch; }
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <header class="masthead">
-      <div class="kicker">The List · A personal eating guide</div>
-      <h1 class="title">Where to eat in LA, SF, NY &amp; <em>Seattle</em>.</h1>
-      <p class="thesis">Not reviews — a hand-built hit-list of the exact dishes worth ordering.
-        <span class="soft">Pick a city, then chase the ones still marked <b>“On the list.”</b></span></p>
-
-      <div class="cta-row">
-        <a class="contribute" href="entry/">Wanna contribute? <span class="arrow">→</span></a>
-        <a class="contribute secondary" href="contributors/">Meet the contributors <span class="arrow">→</span></a>
+  <header class="band">
+    <div class="wrap band-in">
+      <div>
+        <a class="mark" href="./">The List</a>
+        <p class="tagline">The exact dish to order in LA, SF, New York and Seattle.</p>
       </div>
-
-      <div class="cities" id="cities" role="tablist" aria-label="Choose a city"></div>
-    </header>
-
-    <main>
-      <section class="city-head">
-        <div>
-          <h2 id="cityTitle">—</h2>
-          <div class="sub" id="citySub">—</div>
-        </div>
-        <div class="progress">
-          <div class="plabel"><span>Eaten through</span><span><b id="progNum">0</b> <span id="progTot">/ 0</span></span></div>
-          <div class="bar"><span id="progBar" style="width:0%"></span></div>
-        </div>
-      </section>
-
-      <div class="controls">
-        <div class="search-row">
-          <label class="search">
-            <span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M10.5 10.5m-6.5 0a6.5 6.5 0 1 0 13 0a6.5 6.5 0 1 0-13 0M15.5 15.5 20 20"/></svg></span>
-            <input id="search" type="search" placeholder="Search a place, dish, or neighborhood…" aria-label="Search" />
-          </label>
-          <div class="seg" role="group" aria-label="Filter by status">
-            <button data-status="all" aria-pressed="true">All</button>
-            <button data-status="want">On the list</button>
-            <button data-status="tried">Tried</button>
-          </div>
-        </div>
-        <div class="chips" id="chips"></div>
+      <div class="band-actions">
+        <a class="btn-paper" href="entry/">+ Add a spot</a>
+        <a class="link" href="contributors/">Contributors</a>
       </div>
+    </div>
+  </header>
 
-      <div class="resbar">
-        <span id="resCount">—</span>
-        <div class="legend" aria-hidden="true">
-          <span class="lg"><i class="dot tried"></i> Tried</span>
-          <span class="lg"><i class="dot want"></i> On the list</span>
-        </div>
-        <button class="clear" id="clearBtn" hidden>Clear filters ✕</button>
-      </div>
-
-      <div class="grid" id="grid"></div>
-    </main>
-
-    <footer>
-      <span>The List · <b id="footTotal">—</b> spots across 4 cities</span>
-      <span><a href="contributors/">Contributors</a> · Built for friends who ask “where should I eat?”</span>
-    </footer>
+  <div class="tabs-wrap">
+    <nav class="wrap tabs" id="cities" role="tablist" aria-label="City"></nav>
   </div>
+
+  <main class="wrap">
+    <div class="tools">
+      <label class="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="search" type="search" placeholder="Search a dish, place or area" autocomplete="off" aria-label="Search" />
+      </label>
+      <div class="chips" id="chips" role="group" aria-label="Filters"></div>
+      <div class="tally">
+        <span><b id="progNum">0</b> of <span id="progTot">0</span> tried</span>
+        <span class="bar" aria-hidden="true"><span id="progBar" style="width:0%"></span></span>
+        <span class="key" id="resCount"></span>
+      </div>
+    </div>
+
+    <div class="menu" id="menu" aria-live="polite"></div>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot-in">
+      <span>The List · <b id="footTotal">—</b> spots, 4 cities</span>
+      <span><a href="entry/">Add a spot</a> · <a href="contributors/">Contributors</a></span>
+    </div>
+  </footer>
 
   <script src="config.js"></script>
   <script src="data.js"></script>
@@ -534,85 +147,78 @@
     const state = { city: undefined, q: "", status: "all", cuisine: null, price: null };
 
     const $ = (s) => document.querySelector(s);
-    const grid = $("#grid");
+    const menu = $("#menu");
     const cityById = (id) => DATA.find((c) => c.id === id);
-
-    function pricePips(p) {
-      const n = (p.match(/\$/g) || []).length || 0;
-      const max = 3;
-      let out = "";
-      for (let i = 0; i < max; i++) out += `<span class="${i < n ? "" : "off"}">$</span>`;
-      return n ? out : '<span class="off">$$$</span>';
-    }
+    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     function esc(s) {
       return (s || "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
     }
 
+    // Menu order: cuisine, then name. Numbers are fixed per city so filters never renumber a dish.
+    function numbered(c) {
+      return c.places
+        .slice()
+        .sort((a, b) => (a.cuisine || "").localeCompare(b.cuisine || "") || a.name.localeCompare(b.name))
+        .map((p, i) => ({ ...p, no: i + 1 }));
+    }
+
+    const SHORT = { la: "LA", sf: "SF", ny: "NY" };
+
     // ---- City tabs ----
     function renderCities() {
       const el = $("#cities");
       el.innerHTML = DATA.map((c) => `
-        <button class="city-tab" role="tab" data-city="${c.id}" aria-pressed="${c.id === state.city}">
-          <span class="emoji">${c.emoji}</span>
-          <span class="cname">${esc(c.name)}</span>
-          <span class="cmeta">${c.count} spots · ${c.region}</span>
+        <button class="tab" role="tab" data-city="${c.id}" aria-selected="${c.id === state.city}" aria-label="${esc(c.name)}, ${c.count} spots">
+          <span class="full">${esc(c.name)}</span><span class="short">${SHORT[c.id] || esc(c.name)}</span><span class="n">${c.count}</span>
         </button>`).join("");
-      el.querySelectorAll(".city-tab").forEach((b) =>
-        b.addEventListener("click", () => { setCity(b.dataset.city); }));
+      el.querySelectorAll(".tab").forEach((b) =>
+        b.addEventListener("click", () => setCity(b.dataset.city)));
     }
 
     function setCity(id) {
       state.city = id;
       state.cuisine = null; state.price = null; state.q = ""; state.status = "all";
       $("#search").value = "";
-      $$status("all");
-      document.querySelectorAll(".city-tab").forEach((b) =>
-        b.setAttribute("aria-pressed", b.dataset.city === id));
+      document.querySelectorAll(".tab").forEach((b) =>
+        b.setAttribute("aria-selected", b.dataset.city === id));
       renderCityHead();
       renderChips();
-      render();
-    }
-
-    function $$status(v) {
-      document.querySelectorAll(".seg [data-status]").forEach((b) =>
-        b.setAttribute("aria-pressed", b.dataset.status === v));
+      render(true);
     }
 
     function renderCityHead() {
       const c = cityById(state.city);
       const tried = c.places.filter((p) => p.tried).length;
-      $("#cityTitle").textContent = `${c.emoji} ${c.name}`;
-      $("#citySub").textContent = `${c.region} · ${c.count} places on the list`;
       $("#progNum").textContent = tried;
-      $("#progTot").textContent = `/ ${c.count}`;
+      $("#progTot").textContent = c.count;
       $("#progBar").style.width = (c.count ? (tried / c.count) * 100 : 0) + "%";
     }
 
-    // ---- Cuisine + price chips ----
+    // ---- Status, price + cuisine chips ----
     function renderChips() {
       const c = cityById(state.city);
-      const cuisines = [...new Set(c.places.map((p) => p.cuisine).filter(Boolean))]
-        .sort((a, b) => a.localeCompare(b));
-      const prices = [...new Set(c.places.map((p) => p.price).filter(Boolean))]
-        .sort((a, b) => a.length - b.length);
-
-      const chipBtn = (kind, val, label) =>
+      const cuisines = [...new Set(c.places.map((p) => p.cuisine).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+      const prices = [...new Set(c.places.map((p) => p.price).filter(Boolean))].sort((a, b) => a.length - b.length);
+      const chip = (kind, val, label) =>
         `<button class="chip" data-kind="${kind}" data-val="${esc(val)}" aria-pressed="false">${esc(label)}</button>`;
 
       $("#chips").innerHTML =
-        `<span class="glabel">Cuisine</span>` +
-        cuisines.map((cu) => chipBtn("cuisine", cu, cu)).join("") +
-        `<span class="glabel" style="margin-left:8px">Price</span>` +
-        prices.map((pr) => chipBtn("price", pr, pr)).join("");
+        chip("status", "want", "Not yet") + chip("status", "tried", "Tried") +
+        `<span class="sep" aria-hidden="true"></span>` +
+        prices.map((pr) => chip("price", pr, pr)).join("") +
+        `<span class="sep" aria-hidden="true"></span>` +
+        cuisines.map((cu) => chip("cuisine", cu, cu)).join("");
 
       $("#chips").querySelectorAll(".chip").forEach((b) =>
         b.addEventListener("click", () => {
           const k = b.dataset.kind, v = b.dataset.val;
-          state[k] = state[k] === v ? null : v;
+          const off = k === "status" ? "all" : null;
+          state[k] = state[k] === v ? off : v;
           syncChips();
           render();
         }));
+      syncChips();
     }
 
     function syncChips() {
@@ -622,9 +228,8 @@
 
     // ---- Filtering + render ----
     function filtered() {
-      const c = cityById(state.city);
       const q = state.q.trim().toLowerCase();
-      return c.places.filter((p) => {
+      return numbered(cityById(state.city)).filter((p) => {
         if (state.status === "tried" && !p.tried) return false;
         if (state.status === "want" && p.tried) return false;
         if (state.cuisine && p.cuisine !== state.cuisine) return false;
@@ -637,69 +242,92 @@
       });
     }
 
-    const PIN_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>`;
-    const YELP_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7.6885 15.1415-3.6715.8483c-.3769.0871-.755.183-1.1452.155-.2611-.0188-.5122-.0414-.7606-.213a1.179 1.179 0 0 1-.331-.3594c-.3486-.5519-.3656-1.3661-.3697-2.0004a6.2874 6.2874 0 0 1 .3314-2.0642 1.857 1.857 0 0 1 .1073-.2474 2.3426 2.3426 0 0 1 .1255-.2165 2.4572 2.4572 0 0 1 .1563-.1975 1.1736 1.1736 0 0 1 .399-.2831 1.082 1.082 0 0 1 .4592-.0837c.2355.0016.5139.052.91.1734.0555.0191.1237.0382.1856.0572.3277.1013.7048.2404 1.1499.3987.6863.2404 1.3663.487 2.0463.7397l1.2117.4423c.2217.0807.4363.18.6412.297.174.0984.3273.2298.4512.387a1.217 1.217 0 0 1 .192.4309 1.2205 1.2205 0 0 1-.872 1.4522c-.0468.0151-.0852.0239-.1085.0293l-1.105.2553-.0031-.001zM18.8208 7.565a1.8506 1.8506 0 0 0-.2042-.1754 2.4082 2.4082 0 0 0-.2077-.1394 2.3607 2.3607 0 0 0-.2269-.109 1.1705 1.1705 0 0 0-.482-.0796 1.0862 1.0862 0 0 0-.4498.1263c-.2107.1048-.4388.2732-.742.5551-.042.0417-.0947.0886-.142.133-.2502.2351-.5286.5252-.8599.863a114.6363 114.6363 0 0 0-1.5166 1.5629l-.8962.9293a4.1897 4.1897 0 0 0-.4466.5483 1.541 1.541 0 0 0-.2364.5459 1.2199 1.2199 0 0 0 .0107.4518l.0046.02a1.218 1.218 0 0 0 1.4184.923 1.162 1.162 0 0 0 .1105-.0213l4.7781-1.104c.3766-.087.7587-.1667 1.097-.3631.2269-.1316.4428-.262.5909-.5252a1.1793 1.1793 0 0 0 .1405-.4683c.0733-.6512-.2668-1.3908-.5403-1.963a6.2792 6.2792 0 0 0-1.2001-1.7103zM8.9703.0754a8.6724 8.6724 0 0 0-.83.1564c-.2754.066-.548.1383-.8146.2236-.868.2844-2.0884.8063-2.295 1.8065-.1165.5655.1595 1.1439.3737 1.66.2595.6254.614 1.1889.9373 1.7777.8543 1.5545 1.7245 3.0993 2.5922 4.6457.259.4617.5416 1.0464 1.043 1.2856a1.058 1.058 0 0 0 .1013.0383c.2248.0851.4699.1016.7041.0471a4.3015 4.3015 0 0 0 .0418-.0097 1.2136 1.2136 0 0 0 .5658-.3397 1.1033 1.1033 0 0 0 .079-.0822c.3463-.435.3454-1.0833.3764-1.6134.1042-1.771.2139-3.5423.3009-5.3142.0332-.6712.1055-1.3333.0655-2.0096-.0328-.5579-.0368-1.1984-.3891-1.6563-.6218-.8073-1.9476-.741-2.8523-.6158zm2.084 15.9505a1.1053 1.1053 0 0 0-1.2306-.4145 1.1398 1.1398 0 0 0-.1526.0633 1.4806 1.4806 0 0 0-.2171.1354c-.1992.1475-.3668.3392-.5196.5315-.0386.049-.074.1143-.12.1562l-.7686 1.0573a113.9168 113.9168 0 0 0-1.2913 1.789c-.278.3895-.5184.7184-.7083 1.0094-.036.0547-.0734.116-.1075.1647-.2277.3522-.3566.6092-.4228.8381a1.0945 1.0945 0 0 0-.046.4721c.0211.1655.0768.3246.1635.467.046.0715.0957.1406.1487.207a2.334 2.334 0 0 0 .1754.1825 1.843 1.843 0 0 0 .2108.1732c.5304.369 1.1112.6342 1.722.8391a6.0958 6.0958 0 0 0 1.5716.3004c.091.0046.1821.0025.2728-.006a2.3878 2.3878 0 0 0 .2506-.0351 2.3862 2.3862 0 0 0 .2447-.071 1.1927 1.1927 0 0 0 .4175-.2658c.1127-.113.1994-.249.2541-.3989.0889-.2214.1473-.5026.1857-.92.0034-.0593.0118-.1305.0177-.1958.0304-.3463.0443-.7531.0666-1.2315.0375-.7357.067-1.4681.0903-2.2026 0 0 .0495-1.3053.0494-1.306.0113-.3008.002-.6342-.0814-.9336a1.396 1.396 0 0 0-.1756-.4054zm8.6754 2.0439c-.1605-.176-.3878-.3514-.7462-.5682-.0518-.0288-.1124-.0674-.1684-.1009-.2985-.1795-.658-.3684-1.078-.5965a120.7615 120.7615 0 0 0-1.9427-1.042l-1.1515-.6107c-.0597-.0175-.1203-.0607-.1766-.0878-.2212-.1058-.4558-.2045-.6992-.2498a1.4915 1.4915 0 0 0-.2545-.0265 1.1527 1.1527 0 0 0-.1648.01 1.1077 1.1077 0 0 0-.9227.9133 1.4186 1.4186 0 0 0 .0159.439c.0563.3065.1932.6096.3346.875l.615 1.1526c.3422.65.6884 1.2963 1.0435 1.9406.229.4202.4196.7799.5982 1.078.0338.056.0721.1163.1011.1682.2173.3584.392.584.569.7458.1146.1107.252.195.4026.247.1583.0525.326.071.4919.0546a2.368 2.368 0 0 0 .251-.0435c.0817-.022.1622-.048.241-.0784a1.863 1.863 0 0 0 .2475-.1143 6.1018 6.1018 0 0 0 1.2818-.9597c.4596-.4522.8659-.9454 1.182-1.51.044-.08.0819-.163.1138-.2483a2.49 2.49 0 0 0 .0773-.2411c.0186-.083.033-.1669.0429-.2513a1.188 1.188 0 0 0-.0565-.491 1.0933 1.0933 0 0 0-.248-.4041z"/></svg>`;
+    const YELP_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m7.69 15.14-3.67.85c-.38.09-.76.18-1.15.16-.26-.02-.51-.04-.76-.21a1.18 1.18 0 0 1-.33-.36c-.35-.55-.37-1.37-.37-2a6.29 6.29 0 0 1 .33-2.06c.03-.09.07-.17.11-.25.04-.07.08-.15.13-.22.05-.07.1-.13.16-.2.11-.12.25-.22.4-.28.15-.06.3-.09.46-.08.24 0 .51.05.91.17l.19.06c.33.1.7.24 1.15.4.69.24 1.37.49 2.05.74l1.21.44c.22.08.44.18.64.3.17.1.33.23.45.39.09.13.16.28.19.43a1.22 1.22 0 0 1-.87 1.45l-.11.03-1.11.26zM18.82 7.57a1.85 1.85 0 0 0-.2-.18 2.4 2.4 0 0 0-.21-.14 2.36 2.36 0 0 0-.23-.11 1.17 1.17 0 0 0-.48-.08c-.16.01-.31.05-.45.13-.21.1-.44.27-.74.55l-.14.13c-.25.24-.53.53-.86.86-.51.52-1.02 1.04-1.52 1.56l-.9.93c-.17.17-.32.35-.45.55-.11.17-.19.35-.24.55-.03.15-.03.3.01.45v.02a1.22 1.22 0 0 0 1.42.92l.11-.02 4.78-1.1c.38-.09.76-.17 1.1-.36.23-.13.44-.26.59-.53.07-.14.12-.31.14-.47.07-.65-.27-1.39-.54-1.96a6.28 6.28 0 0 0-1.2-1.71zM8.97.08c-.28.04-.56.09-.83.16-.28.06-.55.14-.81.22-.87.28-2.09.81-2.3 1.81-.12.57.16 1.14.37 1.66.26.63.61 1.19.94 1.78.85 1.55 1.72 3.1 2.59 4.65.26.46.54 1.05 1.04 1.29l.1.04c.22.09.47.1.7.05h.04c.22-.06.41-.18.57-.34l.08-.08c.35-.44.35-1.08.38-1.61.1-1.77.21-3.54.3-5.31.03-.67.11-1.33.07-2.01-.03-.56-.04-1.2-.39-1.66-.62-.81-1.95-.74-2.85-.62zm2.08 15.95a1.1 1.1 0 0 0-1.23-.41l-.15.06c-.08.04-.15.08-.22.14-.2.15-.37.34-.52.53-.04.05-.07.11-.12.16l-.77 1.06c-.43.59-.86 1.19-1.29 1.79-.28.39-.52.72-.71 1.01l-.11.16c-.23.35-.36.61-.42.84-.04.15-.05.31-.05.47.02.17.08.32.16.47.05.07.1.14.15.21.05.06.11.13.18.18.07.06.14.12.21.17.53.37 1.11.63 1.72.84.51.17 1.04.27 1.57.3h.27c.09-.01.17-.02.25-.04.08-.02.17-.04.24-.07.16-.06.3-.15.42-.27.11-.11.2-.25.25-.4.09-.22.15-.5.19-.92l.02-.2c.03-.35.04-.75.07-1.23.04-.74.07-1.47.09-2.2l.05-1.31c.01-.3 0-.63-.08-.93a1.4 1.4 0 0 0-.18-.41zm8.68 2.04c-.16-.18-.39-.35-.75-.57l-.17-.1c-.3-.18-.66-.37-1.08-.6-.64-.35-1.29-.7-1.94-1.04l-1.15-.61c-.06-.02-.12-.06-.18-.09-.22-.11-.46-.2-.7-.25l-.25-.03h-.16a1.1 1.1 0 0 0-.92.91c-.02.15-.02.29.02.44.06.31.19.61.33.88l.62 1.15c.34.65.69 1.3 1.04 1.94.23.42.42.78.6 1.08l.1.17c.22.36.39.58.57.75.11.11.25.2.4.25.16.05.33.07.49.05l.25-.04.24-.08.25-.11c.47-.26.9-.58 1.28-.96.46-.45.87-.95 1.18-1.51.04-.08.08-.16.11-.25l.08-.24c.02-.08.03-.17.04-.25.01-.17-.01-.33-.06-.49a1.1 1.1 0 0 0-.25-.4z"/></svg>`;
 
-    function card(p) {
-      const status = p.tried ? "tried" : "want";
-      const dish = p.description
-        ? `<span class="dish">${esc(p.description)}</span>`
-        : `<span class="dish">Chef’s choice — anything goes</span>`;
-      const yelp = p.yelp
-        ? `<a class="t-yelp" href="${esc(p.yelp)}" target="_blank" rel="noopener" aria-label="View ${esc(p.name)} on Yelp">${YELP_SVG}</a>`
-        : `<span class="t-yelp disabled" aria-label="No Yelp link">${YELP_SVG}</span>`;
-      const loc = p.location
-        ? `<div class="t-loc">${PIN_SVG}<span>${esc(p.location)}</span></div>`
-        : `<div class="t-loc"></div>`;
-      return `
-        <article class="ticket">
-          <div class="t-top">
-            <span class="t-lead">
-              <i class="dot ${status}" title="${p.tried ? "Tried" : "On the list"}"></i>
-              <span class="t-cuisine">${esc(p.cuisine)}</span>
-            </span>
-            <span class="t-price">${pricePips(p.price)}</span>
-          </div>
-          <h3 class="t-name">${esc(p.name)}</h3>
-          <p class="t-order"><span class="lead">▸ ORDER</span>${dish}</p>
-          <div class="t-foot">
-            ${loc}
-            ${yelp}
-          </div>
-        </article>`;
+    // A slightly different hand-drawn loop for each number, stable across renders.
+    const LOOPS = [
+      "M33 7.5C27 3.6 13 4 6.5 10.5 1.6 15.4 3.4 25.5 11 29.6c7.6 4.1 20.6 3.5 27-2.4 5.3-4.9 4.6-13.6-1.4-18.3C31.4 4.8 22.5 3.8 16.8 5.2",
+      "M10 7.2C16.5 3.4 30.4 3.6 36.8 9.6c5 4.7 4 14.3-2.6 19-6.9 4.9-19.6 5.1-26.6.4C1.9 25.1 1.7 16.2 6.8 11 11.3 6.4 19.6 4.4 26.4 5.4",
+      "M29.5 5.3C21.5 3 10.2 5 5.3 11.4 1.5 16.5 3.6 25 10.9 28.9c7.4 3.9 19.5 3.6 25.6-1.5 5.7-4.8 5.4-13.6-.8-18.5-4.2-3.3-9.7-4.4-14.6-3.9",
+    ];
+    function pen(no) {
+      const r = ((no * 37) % 13) - 6;
+      return `<svg viewBox="0 0 44 36" aria-hidden="true"><path d="${LOOPS[no % 3]}" transform="rotate(${r} 22 18)"/></svg>`;
     }
 
-    function render() {
+    function item(p, i) {
+      const dish = p.description || "Chef’s choice, anything goes";
+      const c = cityById(state.city);
+      const place = p.yelp
+        ? `<a href="${esc(p.yelp)}" target="_blank" rel="noopener">${esc(p.name)}${YELP_SVG}<span class="sr">on Yelp (opens in new tab)</span></a>`
+        : `<span class="nm">${esc(p.name)}</span>`;
+      const area = p.location && p.location !== c.name ? `<span>${esc(p.location)}</span>` : "";
+      return `
+        <div class="it">
+          <span class="no" style="--d:${Math.min(i, 14) * 0.04}s">${p.no}${p.tried ? pen(p.no) + '<span class="sr">, tried</span>' : ""}</span>
+          <h3 class="dish">${esc(dish)}</h3>
+          <span class="pr">${esc(p.price || "")}</span>
+          <div class="pl">${place}${area}</div>
+        </div>`;
+    }
+
+    function render(draw) {
       const list = filtered();
       const c = cityById(state.city);
-      grid.innerHTML = list.length
-        ? list.map(card).join("")
-        : `<div class="empty"><h3>Nothing matches yet</h3><p>Loosen a filter or clear your search to see more of ${esc(c.name)}.</p></div>`;
-
       const anyFilter = state.q || state.status !== "all" || state.cuisine || state.price;
-      $("#resCount").textContent =
-        `Showing ${list.length} of ${c.count}` + (anyFilter ? " · filtered" : "");
-      $("#clearBtn").hidden = !anyFilter;
+
+      if (!list.length) {
+        menu.className = "menu";
+        menu.innerHTML = `<div class="empty"><h2>Not on the menu</h2><p>Nothing in ${esc(c.name)} matches that. Try fewer filters or another search.</p><button class="btn-red" id="emptyClear">Clear filters</button></div>`;
+        $("#emptyClear").addEventListener("click", clearAll);
+      } else {
+        // In multi-column layout, long cuisines split into chunks so columns balance; later chunks say "cont.".
+        const max = WIDE.matches ? 6 : Infinity;
+        const groups = [];
+        for (const p of list) {
+          const last = groups[groups.length - 1];
+          if (last && last.cuisine === p.cuisine && last.items.length < max) last.items.push(p);
+          else groups.push({ cuisine: p.cuisine, items: [p], cont: !!last && last.cuisine === p.cuisine, total: 0 });
+        }
+        for (const g of groups) g.total = list.filter((p) => p.cuisine === g.cuisine).length;
+        let i = 0;
+        menu.innerHTML = groups.map((g) => `
+          <section class="sec${g.cont ? " cont" : ""}">
+            <h2>${esc(g.cuisine || "Other")}<span class="ct">${g.cont ? "cont." : g.total}</span></h2>
+            ${g.items.map((p) => item(p, i++)).join("")}
+          </section>`).join("");
+        // A "cont." chunk that landed in the same column as its section merges back into it.
+        menu.querySelectorAll(".sec.cont").forEach((sec) => {
+          const prev = sec.previousElementSibling;
+          if (prev && prev.offsetLeft === sec.offsetLeft) { prev.append(...sec.querySelectorAll(".it")); sec.remove(); }
+        });
+        // Pen circles draw in only when a city opens, not on every keystroke.
+        menu.className = "menu" + (draw && !reduceMotion ? " draw" : "");
+      }
+
+      $("#resCount").innerHTML = anyFilter
+        ? `${list.length} shown · <button class="clear" id="clearBtn">Clear</button>`
+        : `<svg viewBox="0 0 44 36" aria-hidden="true"><path d="${LOOPS[0]}"/></svg> = tried`;
+      const cb = $("#clearBtn");
+      if (cb) cb.addEventListener("click", clearAll);
     }
 
     function clearAll() {
       state.q = ""; state.status = "all"; state.cuisine = null; state.price = null;
       $("#search").value = "";
-      $$status("all");
       syncChips();
       render();
     }
 
-    // ---- Wire up ----
+    const WIDE = matchMedia("(min-width: 760px)");
+    WIDE.addEventListener("change", () => { if (state.city) render(); });
+
     $("#search").addEventListener("input", (e) => { state.q = e.target.value; render(); });
-    document.querySelectorAll(".seg [data-status]").forEach((b) =>
-      b.addEventListener("click", () => { state.status = b.dataset.status; $$status(state.status); render(); }));
-    $("#clearBtn").addEventListener("click", clearAll);
 
     // ---- Boot ----
     function start() {
       if (!DATA.length) {
-        grid.innerHTML = `<div class="empty"><h3>No data loaded</h3><p>The guide couldn't reach the server. Try again in a moment.</p></div>`;
+        menu.innerHTML = `<div class="empty"><h2>Kitchen’s closed</h2><p>The guide couldn’t reach the server. Try again in a moment.</p></div>`;
         return;
       }
       state.city = DATA[0].id;
@@ -707,12 +335,12 @@
       renderCities();
       renderCityHead();
       renderChips();
-      render();
+      render(true);
     }
 
     // Primary source of truth is Postgres via /api/places; fall back to the
     // statically-built data.js if the API is unreachable.
-    grid.innerHTML = `<div class="empty"><h3>Loading the list…</h3><p>Fetching the latest spots.</p></div>`;
+    menu.innerHTML = `<div class="empty"><h2>Loading the menu…</h2></div>`;
     fetch(API_BASE + "/api/places", { headers: { Accept: "application/json" } })
       .then((r) => { if (!r.ok) throw new Error("api"); return r.json(); })
       .then((d) => { DATA = (d && d.cities) || []; start(); })

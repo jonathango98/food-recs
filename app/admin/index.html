@@ -3,143 +3,64 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>The List — Admin · Review</title>
+<title>The List - Admin</title>
 <meta name="robots" content="noindex" />
+<meta name="theme-color" content="#C8102E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../menu.css" />
 <style>
-  :root {
-    --paper: #FBF7EE; --card: #FFFDF8; --ink: #1E1B17; --ink-soft: #756B5F;
-    --line: #E6DCCB; --line-strong: #D6C9B2; --tomato: #D8412F; --pine: #176B5C;
-    --gold: #E8A33D; --shadow: 14px 16px 0 rgba(30, 27, 23, 0.06); --r: 4px;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; background-color: var(--paper);
-    background-image: radial-gradient(rgba(30,27,23,0.035) 1px, transparent 1px);
-    background-size: 22px 22px; color: var(--ink);
-    font-family: "Newsreader", Georgia, serif; font-size: 17px; line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-  }
-  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
-  a { color: var(--tomato); text-underline-offset: 3px; }
-  .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px 80px; }
+  .band-in { padding-top: 16px; padding-bottom: 18px; }
+  .band-top { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 14px; }
+  .band-top button { appearance: none; background: none; border: 0; padding: 0; cursor: pointer; font: inherit; font-weight: 600; font-size: .95rem; color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+  .login { padding-top: 28px; padding-bottom: 60px; }
+  .login form { max-width: 380px; }
+  .login form { display: grid; gap: 14px; }
+  .login .btn-red { width: 100%; }
+  .msg { min-height: 1.45em; margin: 0; color: var(--soft); }
+  .msg.err { color: var(--red); font-weight: 600; }
 
-  header.masthead { padding: 40px 0 8px; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
-  .kicker {
-    font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: 0.22em;
-    text-transform: uppercase; color: var(--tomato);
-  }
-  h1.title {
-    font-family: "Bricolage Grotesque", sans-serif; font-weight: 800;
-    font-size: clamp(2rem, 5vw, 3rem); line-height: 0.95; letter-spacing: -0.02em; margin: 12px 0 0;
-  }
-  h1.title em { font-style: normal; color: var(--tomato); }
-  .topright { font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--ink-soft); text-align: right; }
-  .linkbtn { appearance: none; background: none; border: 0; cursor: pointer; color: var(--tomato); font: inherit; padding: 0; }
+  .tabs { display: flex; gap: 8px; padding-top: 16px; padding-bottom: 6px; overflow-x: auto; }
+  .chip .n { font-variant-numeric: tabular-nums; opacity: .7; }
+  .menu-h { margin-top: 22px; }
+  .menu-h .ct { font-size: .5em; font-variation-settings: "wdth" 100; color: var(--soft); margin-left: 6px; }
 
-  /* ---- Login ---- */
-  .login {
-    max-width: 380px; margin: 60px auto; background: var(--card);
-    border: 1.5px solid var(--line-strong); border-radius: var(--r);
-    box-shadow: var(--shadow); padding: 28px;
+  .list { padding-bottom: 40px; }
+  .it { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; column-gap: 8px; align-items: start; padding: 11px 0; border-bottom: 1px solid var(--rule); }
+  .it.busy { opacity: .55; }
+  .no { font: 800 1.05rem/1.15 var(--sans); font-variant-numeric: tabular-nums; text-align: center; padding-top: 2px; }
+  .dish { margin: 0; font: 700 1.2rem/1.15 var(--sans); display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+  .dish span { min-width: 0; overflow-wrap: anywhere; }
+  .dish::after { content: ""; flex: 1 1 12px; min-width: 12px; border-bottom: 2px dotted #CDBFBA; transform: translateY(-.25em); }
+  .pr { font: 700 1.05rem/1 var(--sans); font-variant-numeric: tabular-nums; }
+  .pl { grid-column: 2; margin-top: 3px; font-size: .95rem; color: var(--soft); display: flex; flex-wrap: wrap; gap: 2px 8px; }
+  .pl .nm { color: var(--ink); font-weight: 600; }
+  .pl a { color: var(--ink); font-weight: 600; text-decoration-color: var(--rule); }
+  .by { grid-column: 2; margin-top: 2px; font-size: .95rem; color: var(--soft); overflow-wrap: anywhere; }
+  .st { color: var(--red); font-weight: 700; }
+  .st.approved { color: var(--ok); }
+  .actions { grid-column: 3; grid-row: 1 / span 3; display: flex; gap: 8px; align-items: center; justify-content: flex-end; flex-wrap: wrap; }
+  .triedtoggle { display: inline-flex; gap: 4px; }
+  .triedtoggle button { appearance: none; cursor: pointer; background: none; border: 1.5px solid transparent; border-radius: 999px; min-height: 40px; padding: 0 14px; font: 600 .95rem var(--sans); color: var(--soft); position: relative; }
+  .triedtoggle button.on { color: var(--ink); }
+  .triedtoggle button.on[data-tried="true"] { color: var(--pen); font-weight: 800; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 36' preserveAspectRatio='none'%3E%3Cpath d='M33 7.5C27 3.6 13 4 6.5 10.5 1.6 15.4 3.4 25.5 11 29.6c7.6 4.1 20.6 3.5 27-2.4 5.3-4.9 4.6-13.6-1.4-18.3C31.4 4.8 22.5 3.8 16.8 5.2' fill='none' stroke='%232B4FD8' stroke-width='1.6' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
+  .triedtoggle button:not(.on):hover { color: var(--ink); }
+  .btn-line:disabled, .triedtoggle button:disabled { opacity: .55; cursor: default; }
+  .empty { padding: 32px 0 20px; }
+  .empty h2 { font: 900 2rem/1 var(--sans); font-variation-settings: "wdth" 62; color: var(--red); text-transform: uppercase; margin: 0 0 6px; }
+  .empty p { margin: 0; color: var(--soft); }
+  @media (max-width: 719px) {
+    .it { grid-template-columns: 32px minmax(0, 1fr); }
+    .actions { grid-column: 2; grid-row: auto; justify-content: flex-start; margin-top: 10px; }
   }
-  .login h2 { font-family: "Bricolage Grotesque", sans-serif; margin: 0 0 4px; }
-  .login p { color: var(--ink-soft); font-size: 14px; margin: 0 0 18px; }
-  .field { margin-bottom: 14px; }
-  .field label {
-    display: block; font-family: "JetBrains Mono", monospace; font-size: 11px;
-    letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 6px;
-  }
-  .field input, .field select {
-    width: 100%; font-family: inherit; font-size: 16px; color: var(--ink);
-    background: var(--paper); border: 1.5px solid var(--line-strong); border-radius: var(--r); padding: 10px 12px;
-  }
-  .field input:focus, .field select:focus { outline: none; border-color: var(--tomato); }
-  .btn {
-    appearance: none; cursor: pointer; font-family: "Bricolage Grotesque", sans-serif;
-    font-weight: 700; font-size: 15px; border-radius: var(--r); padding: 10px 18px;
-    border: 1.5px solid var(--tomato); background: var(--tomato); color: #fff;
-  }
-  .btn:hover { filter: brightness(1.05); }
-  .btn.ghost { background: transparent; color: var(--ink); border-color: var(--ink); }
-  .btn.ghost:hover { background: rgba(30,27,23,0.05); }
-  .btn:disabled { opacity: 0.5; cursor: default; }
-  .msg { font-family: "JetBrains Mono", monospace; font-size: 13px; margin-top: 10px; min-height: 18px; }
-  .msg.err { color: var(--tomato); }
-
-  /* ---- Tabs ---- */
-  .tabs { display: flex; gap: 8px; margin: 28px 0 18px; flex-wrap: wrap; }
-  .tab {
-    appearance: none; cursor: pointer; background: var(--card);
-    border: 1.5px solid var(--line-strong); border-radius: var(--r);
-    font-family: "JetBrains Mono", monospace; font-size: 13px; padding: 8px 14px; color: var(--ink-soft);
-  }
-  .tab[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-  .tab .n { opacity: 0.7; }
-
-  /* ---- Cards ---- */
-  .list { display: grid; gap: 14px; }
-  .sub {
-    background: var(--card); border: 1.5px solid var(--line-strong);
-    border-radius: var(--r); padding: 16px 18px; position: relative;
-  }
-  .sub .head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-  .sub .name { font-family: "Bricolage Grotesque", sans-serif; font-weight: 700; font-size: 1.3rem; }
-  .sub .city {
-    font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: 0.1em;
-    text-transform: uppercase; color: var(--ink-soft);
-  }
-  .sub .meta { font-family: "JetBrains Mono", monospace; font-size: 12.5px; color: var(--ink-soft); margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px 16px; }
-  .sub .meta b { color: var(--ink); font-weight: 500; }
-  .sub .order { margin: 10px 0 0; }
-  .sub .order .lead { font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--tomato); margin-right: 8px; }
-  .sub .note { margin: 10px 0 0; font-style: italic; color: var(--ink); border-left: 3px solid var(--line-strong); padding-left: 12px; }
-  .sub .by { margin-top: 8px; font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--ink-soft); }
-  .badge {
-    font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.12em;
-    text-transform: uppercase; padding: 3px 8px; border-radius: 100px; border: 1.5px solid;
-  }
-  .badge.pending { color: var(--gold); border-color: var(--gold); }
-  .badge.approved { color: var(--pine); border-color: var(--pine); }
-  .badge.rejected { color: var(--tomato); border-color: var(--tomato); }
-
-  .actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
-  .actions .spacer { flex: 1; }
-  .abtn {
-    appearance: none; cursor: pointer; font-family: "JetBrains Mono", monospace;
-    font-size: 12px; font-weight: 700; border-radius: var(--r); padding: 7px 12px; border: 1.5px solid;
-    background: transparent;
-  }
-  .abtn.approve { color: var(--pine); border-color: var(--pine); }
-  .abtn.approve:hover { background: var(--pine); color: #fff; }
-  .abtn.reject { color: var(--tomato); border-color: var(--tomato); }
-  .abtn.reject:hover { background: var(--tomato); color: #fff; }
-  .abtn.del { color: var(--ink-soft); border-color: var(--line-strong); }
-  .abtn.del:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
-
-  .triedtoggle { display: inline-flex; border: 1.5px solid var(--line-strong); border-radius: var(--r); overflow: hidden; }
-  .triedtoggle button {
-    appearance: none; cursor: pointer; background: var(--paper); border: 0;
-    border-right: 1.5px solid var(--line-strong); font-family: "JetBrains Mono", monospace;
-    font-size: 11px; font-weight: 700; padding: 6px 10px; color: var(--ink-soft);
-  }
-  .triedtoggle button:last-child { border-right: 0; }
-  .triedtoggle button.on[data-tried="true"] { background: var(--pine); color: #fff; }
-  .triedtoggle button.on[data-tried="false"] { background: var(--gold); color: var(--ink); }
-
-  .empty { text-align: center; padding: 50px 20px; border: 2px dashed var(--line-strong); border-radius: var(--r); color: var(--ink-soft); }
-  .empty h3 { font-family: "Bricolage Grotesque", sans-serif; color: var(--ink); margin: 0 0 6px; }
-  :focus-visible { outline: 3px solid var(--tomato); outline-offset: 2px; }
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <!-- ---- Login ---- -->
-    <div class="login" id="login">
-      <h2>Admin</h2>
-      <p>Enter the admin password to review submissions.</p>
+  <!-- ---- Login ---- -->
+  <div id="login">
+    <header class="band"><div class="wrap band-in"><h1 class="page-title">Admin</h1></div></header>
+    <div class="wrap login">
       <form id="loginForm">
         <div class="field">
           <label for="user">User</label>
@@ -149,32 +70,31 @@
           <label for="pass">Password</label>
           <input type="password" id="pass" autocomplete="current-password" required />
         </div>
-        <button type="submit" class="btn" id="loginBtn">Enter →</button>
-        <div class="msg" id="loginMsg"></div>
+        <button type="submit" class="btn-red" id="loginBtn">Sign in</button>
+        <div class="msg" id="loginMsg" role="status"></div>
       </form>
     </div>
+  </div>
 
-    <!-- ---- Dashboard ---- -->
-    <div id="dash" hidden>
-      <header class="masthead">
-        <div>
-          <div class="kicker">The List · Admin</div>
-          <h1 class="title">Review <em>submissions</em>.</h1>
+  <!-- ---- Dashboard ---- -->
+  <div id="dash" hidden>
+    <header class="band">
+      <div class="wrap band-in">
+        <div class="band-top">
+          <a class="back" href="../index.html"><svg class="ar" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg>The List</a>
+          <button id="logout">Log out</button>
         </div>
-        <div class="topright">
-          <a href="../index.html">View guide ↗</a><br />
-          <button class="linkbtn" id="logout">Log out</button>
-        </div>
-      </header>
-
-      <div class="tabs" id="tabs">
-        <button class="tab" data-status="pending"  aria-pressed="true">Pending <span class="n" id="n-pending"></span></button>
-        <button class="tab" data-status="approved" aria-pressed="false">Approved <span class="n" id="n-approved"></span></button>
-        <button class="tab" data-status="rejected" aria-pressed="false">Rejected <span class="n" id="n-rejected"></span></button>
-        <button class="tab" data-status="all"      aria-pressed="false">All</button>
+        <h1 class="page-title">Review</h1>
       </div>
-
-      <div class="list" id="list"></div>
+    </header>
+    <div class="wrap">
+      <div class="tabs" id="tabs">
+        <button class="chip tab" data-status="pending"  aria-pressed="true">Pending <span class="n" id="n-pending"></span></button>
+        <button class="chip tab" data-status="approved" aria-pressed="false">Approved <span class="n" id="n-approved"></span></button>
+        <button class="chip tab" data-status="rejected" aria-pressed="false">Rejected <span class="n" id="n-rejected"></span></button>
+        <button class="chip tab" data-status="all"      aria-pressed="false">All</button>
+      </div>
+      <div class="list" id="list" aria-live="polite"></div>
     </div>
   </div>
 
@@ -186,10 +106,10 @@
     const $ = (s) => document.querySelector(s);
 
     const CITY = {
-      la:  { name: "Los Angeles",   emoji: "🌴" },
-      sf:  { name: "San Francisco", emoji: "🌉" },
-      ny:  { name: "New York",      emoji: "🗽" },
-      sea: { name: "Seattle",       emoji: "🌧️" },
+      la:  { name: "Los Angeles" },
+      sf:  { name: "San Francisco" },
+      ny:  { name: "New York" },
+      sea: { name: "Seattle" },
     };
 
     let auth = sessionStorage.getItem(AUTH_KEY) || "";
@@ -205,7 +125,7 @@
         ...opts,
         headers: { "Authorization": "Basic " + auth, "Content-Type": "application/json", ...(opts.headers || {}) },
       });
-      if (res.status === 401) { logout("Session expired — log in again."); throw new Error("unauthorized"); }
+      if (res.status === 401) { logout("Session expired, log in again."); throw new Error("unauthorized"); }
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Request failed.");
       return data;
@@ -218,7 +138,7 @@
       const pass = $("#pass").value;
       auth = btoa(user + ":" + pass);
       $("#loginBtn").disabled = true;
-      $("#loginMsg").textContent = "Checking…"; $("#loginMsg").className = "msg";
+      $("#loginMsg").textContent = "Checking..."; $("#loginMsg").className = "msg";
       try {
         await api("/api/entries?status=pending");
         sessionStorage.setItem(AUTH_KEY, auth);
@@ -255,7 +175,7 @@
 
     // ---- Load + render ----
     async function load() {
-      $("#list").innerHTML = `<div class="empty"><h3>Loading…</h3></div>`;
+      $("#list").innerHTML = `<p class="hint">Loading...</p>`;
       try {
         const q = tab === "all" ? "" : "?status=" + tab;
         const data = await api("/api/entries" + q);
@@ -264,7 +184,7 @@
         refreshCounts();
       } catch (err) {
         if (err.message !== "unauthorized")
-          $("#list").innerHTML = `<div class="empty"><h3>Couldn't load</h3><p>${esc(err.message)}</p></div>`;
+          $("#list").innerHTML = `<div class="empty"><h2>Error</h2><p class="err">${esc(err.message)}</p><p><button class="btn-line" id="retry">Retry</button></p></div>`;
       }
     }
 
@@ -282,47 +202,44 @@
       catch (e) { return ""; }
     }
 
-    function card(e) {
-      const c = CITY[e.city] || { name: e.city, emoji: "" };
-      const yelp = e.yelp ? `<a href="${esc(e.yelp)}" target="_blank" rel="noopener">Yelp ↗</a>` : "—";
+    function card(e, i) {
+      const c = CITY[e.city] || { name: e.city };
+      const place = e.yelp ? `<a href="${esc(e.yelp)}" target="_blank" rel="noopener">${esc(e.name)}</a>` : `<span class="nm">${esc(e.name)}</span>`;
+      const area = [c.name, e.location, e.cuisine].filter(Boolean).map((x) => `<span>${esc(x)}</span>`).join("");
+      const stat = e.status !== "approved" ? `<span class="st">${esc(e.status)}</span>` : "";
       return `
-        <article class="sub" data-id="${e.id}">
-          <div class="head">
-            <div>
-              <div class="city">${c.emoji} ${esc(c.name)}</div>
-              <div class="name">${esc(e.name)}</div>
-            </div>
-            <span class="badge ${e.status}">${e.status}</span>
-          </div>
-          <div class="meta">
-            <span><b>${esc(e.cuisine || "—")}</b></span>
-            <span>⌖ <b>${esc(e.location || "—")}</b></span>
-            <span><b>${esc(e.price || "—")}</b></span>
-            <span>${yelp}</span>
-          </div>
-          <p class="order"><span class="lead">▸ ORDER</span>${esc(e.description || "—")}</p>
-          ${e.note ? `<p class="note">${esc(e.note)}</p>` : ""}
-          <div class="by">— ${esc(e.submitted_by || "anonymous")} · ${fmtDate(e.created_at)}</div>
+        <div class="it" data-id="${e.id}">
+          <span class="no">${i + 1}</span>
+          <h3 class="dish"><span>${esc(e.description || "-")}</span>${e.price ? `<span class="pr">${esc(e.price)}</span>` : ""}</h3>
+          <div class="pl">${place}${area}${stat}</div>
+          <div class="by">${esc(e.submitted_by || "anonymous")}, ${fmtDate(e.created_at)}${e.note ? ": " + esc(e.note) : ""}</div>
           <div class="actions">
             <div class="triedtoggle" role="group" aria-label="Tried status">
-              <button data-tried="true"  class="${e.tried ? "on" : ""}">✓ Tried</button>
-              <button data-tried="false" class="${e.tried ? "" : "on"}">○ On the list</button>
+              <button data-tried="true"  class="${e.tried ? "on" : ""}">Tried</button>
+              <button data-tried="false" class="${e.tried ? "" : "on"}">Not yet</button>
             </div>
-            <div class="spacer"></div>
-            ${e.status !== "approved" ? `<button class="abtn approve" data-act="approved">Approve</button>` : `<button class="abtn reject" data-act="pending">Unpublish</button>`}
-            ${e.status !== "rejected" ? `<button class="abtn reject" data-act="rejected">Reject</button>` : ""}
-            <button class="abtn del" data-act="delete">Delete</button>
+            ${e.status !== "approved" ? `<button class="btn-red" data-act="approved">Approve</button>` : `<button class="btn-line" data-act="pending">Unpublish</button>`}
+            ${e.status !== "rejected" ? `<button class="btn-line" data-act="rejected">Reject</button>` : ""}
+            <button class="btn-line" data-act="delete">Delete</button>
           </div>
-        </article>`;
+        </div>`;
     }
 
     function render() {
       if (!entries.length) {
-        $("#list").innerHTML = `<div class="empty"><h3>Nothing here</h3><p>No ${tab === "all" ? "" : tab} submissions.</p></div>`;
+        $("#list").innerHTML = `<div class="empty"><h2>Empty</h2><p>No ${tab === "all" ? "" : tab + " "}submissions.</p></div>`;
         return;
       }
-      $("#list").innerHTML = entries.map(card).join("");
-      $("#list").querySelectorAll(".sub").forEach(wire);
+      let html = "";
+      if (tab === "all") {
+        let n = 0;
+        for (const s of ["pending", "approved", "rejected"]) {
+          const g = entries.filter((e) => e.status === s);
+          if (g.length) html += `<h2 class="menu-h">${s}<span class="ct">${g.length}</span></h2>` + g.map((e) => card(e, n++)).join("");
+        }
+      } else html = entries.map(card).join("");
+      $("#list").innerHTML = html;
+      $("#list").querySelectorAll(".it").forEach(wire);
     }
 
     function wire(el) {
@@ -344,14 +261,21 @@
           try {
             if (act === "delete") {
               if (!confirm("Delete this submission permanently?")) return;
+              el.classList.add("busy"); el.querySelectorAll("button").forEach((x) => (x.disabled = true));
               await api("/api/entries/" + id, { method: "DELETE" });
             } else {
+              el.classList.add("busy"); el.querySelectorAll("button").forEach((x) => (x.disabled = true));
               await api("/api/entries/" + id, { method: "PATCH", body: JSON.stringify({ status: act }) });
             }
             load();
-          } catch (err) { alert(err.message); }
+          } catch (err) {
+            el.classList.remove("busy"); el.querySelectorAll("button").forEach((x) => (x.disabled = false));
+            alert(err.message);
+          }
         }));
     }
+
+    $("#list").addEventListener("click", (e) => { if (e.target.id === "retry") load(); });
 
     // ---- Boot ----
     if (auth) {

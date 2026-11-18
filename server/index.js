@@ -136,8 +136,8 @@ app.post('/api/entries', async (req, res) => {
     };
 
     if (!VALID_CITIES.has(row.city)) return res.status(400).json({ error: 'Pick a valid city.' });
-    // Every field is required.
-    const required = ['name', 'cuisine', 'description', 'location', 'price', 'yelp', 'submitted_by', 'note'];
+    // Every field except neighborhood (location) is required.
+    const required = ['name', 'cuisine', 'description', 'price', 'yelp', 'submitted_by', 'note'];
     const missing = required.filter((f) => !row[f]);
     if (missing.length) return res.status(400).json({ error: `Missing required field(s): ${missing.join(', ')}.` });
     if (!/^https?:\/\//i.test(row.yelp)) return res.status(400).json({ error: 'Yelp must be a valid URL.' });

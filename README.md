@@ -21,7 +21,7 @@ data/*.csv ──(seed once)──▶ Postgres `entries` table ◀── POST /e
   guide; `status='pending'` waits for review.
 - **`app/index.html`** fetches `GET /api/places`. If the API is unreachable it
   falls back to the statically-built `app/data.js`.
-- **`/entry`** — public form, all fields required, inserts a `pending` row.
+- **`/entry`** — public form, all fields required except neighborhood, inserts a `pending` row.
 - **`/admin`** — Basic-Auth dashboard (`ADMIN_USER` / `ADMIN_PASSWORD`, checked
   server-side) to approve/reject/delete and toggle each entry's **tried** flag.
 
