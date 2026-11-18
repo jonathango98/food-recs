@@ -256,7 +256,7 @@
     }
 
     function item(p, i) {
-      const dish = p.description || "Chef’s choice, anything goes";
+      const dish = p.description || "Chef’s choice";
       const c = cityById(state.city);
       const place = p.yelp
         ? `<a href="${esc(p.yelp)}" target="_blank" rel="noopener">${esc(p.name)}${YELP_SVG}<span class="sr">on Yelp (opens in new tab)</span></a>`
@@ -267,7 +267,7 @@
           <span class="no" style="--d:${Math.min(i, 14) * 0.04}s">${p.no}${p.tried ? pen(p.no) + '<span class="sr">, tried</span>' : ""}</span>
           <h3 class="dish">${esc(dish)}</h3>
           <span class="pr">${esc(p.price || "")}</span>
-          <div class="pl">${place}${area}</div>
+          <div class="pl">${place}${area}${!p.description && p.id ? `<button class="clear" data-suggest="${p.id}" data-name="${esc(p.name)}">Suggest dish</button>` : ""}</div>
         </div>`;
     }
 
@@ -321,6 +321,25 @@
 
     const WIDE = matchMedia("(min-width: 760px)");
     WIDE.addEventListener("change", () => { if (state.city) render(); });
+
+    // Chef's-choice places: suggestions land in the admin review queue.
+    menu.addEventListener("click", async (e) => {
+      const b = e.target.closest("[data-suggest]");
+      if (!b) return;
+      const dish = (prompt(`What should people order at ${b.dataset.name}?`) || "").trim();
+      if (!dish) return;
+      b.disabled = true;
+      try {
+        const r = await fetch(API_BASE + "/api/entries/" + b.dataset.suggest + "/suggestions", {
+          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ dish }),
+        });
+        if (!r.ok) throw new Error();
+        b.textContent = "Thanks!";
+      } catch (_) {
+        b.disabled = false;
+        alert("Couldn’t send that. Try again.");
+      }
+    });
 
     $("#search").addEventListener("input", (e) => { state.q = e.target.value; render(); });
 

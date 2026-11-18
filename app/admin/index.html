@@ -47,6 +47,12 @@
   .triedtoggle button.on[data-tried="true"] { color: var(--pen); font-weight: 800; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 36' preserveAspectRatio='none'%3E%3Cpath d='M33 7.5C27 3.6 13 4 6.5 10.5 1.6 15.4 3.4 25.5 11 29.6c7.6 4.1 20.6 3.5 27-2.4 5.3-4.9 4.6-13.6-1.4-18.3C31.4 4.8 22.5 3.8 16.8 5.2' fill='none' stroke='%232B4FD8' stroke-width='1.6' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
   .triedtoggle button:not(.on):hover { color: var(--ink); }
   .btn-line:disabled, .triedtoggle button:disabled { opacity: .55; cursor: default; }
+  .lnk { appearance: none; background: none; border: 0; padding: 0 0 0 6px; cursor: pointer; font: 600 .95rem var(--sans); color: var(--red); text-decoration: underline; text-underline-offset: 3px; }
+  .sug b { color: var(--ink); }
+  .it.editing > :not(.no):not(.edit) { display: none; }
+  .edit { grid-column: 2 / -1; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .edit .field { font-weight: 700; font-size: .95rem; }
+  .edit-actions { grid-column: 1 / -1; display: flex; gap: 8px; }
   .empty { padding: 32px 0 20px; }
   .empty h2 { font: 900 2rem/1 var(--sans); font-variation-settings: "wdth" 62; color: var(--red); text-transform: uppercase; margin: 0 0 6px; }
   .empty p { margin: 0; color: var(--soft); }
@@ -92,6 +98,7 @@
         <button class="chip tab" data-status="pending"  aria-pressed="true">Pending <span class="n" id="n-pending"></span></button>
         <button class="chip tab" data-status="approved" aria-pressed="false">Approved <span class="n" id="n-approved"></span></button>
         <button class="chip tab" data-status="rejected" aria-pressed="false">Rejected <span class="n" id="n-rejected"></span></button>
+        <button class="chip tab" data-status="suggested" aria-pressed="false">Suggested <span class="n" id="n-suggested"></span></button>
         <button class="chip tab" data-status="all"      aria-pressed="false">All</button>
       </div>
       <div class="list" id="list" aria-live="polite"></div>
@@ -99,6 +106,7 @@
   </div>
 
   <script src="../config.js"></script>
+  <script src="../cuisines.js"></script>
   <script>
   (function () {
     const API_BASE = window.API_BASE || "";
@@ -190,7 +198,7 @@
 
     async function refreshCounts() {
       try {
-        for (const s of ["pending", "approved", "rejected"]) {
+        for (const s of ["pending", "approved", "rejected", "suggested"]) {
           const d = await api("/api/entries?status=" + s);
           $("#n-" + s).textContent = "(" + (d.entries || []).length + ")";
         }
@@ -213,6 +221,7 @@
           <h3 class="dish"><span>${esc(e.description || "-")}</span>${e.price ? `<span class="pr">${esc(e.price)}</span>` : ""}</h3>
           <div class="pl">${place}${area}${stat}</div>
           <div class="by">${esc(e.submitted_by || "anonymous")}, ${fmtDate(e.created_at)}${e.note ? ": " + esc(e.note) : ""}</div>
+          ${(e.suggestions || []).map((g) => `<div class="by sug">Suggested: <b>${esc(g.dish)}</b><button class="lnk" data-use="${g.id}">Use</button><button class="lnk" data-dismiss="${g.id}">Dismiss</button></div>`).join("")}
           <div class="actions">
             <div class="triedtoggle" role="group" aria-label="Tried status">
               <button data-tried="true"  class="${e.tried ? "on" : ""}">Tried</button>
@@ -220,9 +229,28 @@
             </div>
             ${e.status !== "approved" ? `<button class="btn-red" data-act="approved">Approve</button>` : `<button class="btn-line" data-act="pending">Unpublish</button>`}
             ${e.status !== "rejected" ? `<button class="btn-line" data-act="rejected">Reject</button>` : ""}
+            <button class="btn-line" data-edit>Edit</button>
             <button class="btn-line" data-act="delete">Delete</button>
           </div>
         </div>`;
+    }
+
+    function editForm(e) {
+      const opts = (pairs, cur) => pairs.map(([v, l]) => `<option value="${esc(v)}"${v === cur ? " selected" : ""}>${esc(l)}</option>`).join("");
+      // A pre-dropdown cuisine (e.g. "Ramen") stays selectable so other edits don't silently change it.
+      const cuisines = window.CUISINES.map((c) => [c, c]);
+      if (e.cuisine && !window.CUISINES.includes(e.cuisine)) cuisines.unshift([e.cuisine, e.cuisine + " (old)"]);
+      return `
+        <form class="edit">
+          <label class="field">Place<input name="name" required value="${esc(e.name)}" /></label>
+          <label class="field">Dish<input name="description" value="${esc(e.description)}" placeholder="Chef’s choice" /></label>
+          <label class="field">Cuisine<select name="cuisine">${opts(cuisines, e.cuisine)}</select></label>
+          <label class="field">City<select name="city">${opts(Object.entries(CITY).map(([id, c]) => [id, c.name]), e.city)}</select></label>
+          <label class="field">Neighborhood<input name="location" value="${esc(e.location)}" /></label>
+          <label class="field">Price<select name="price">${opts([["", "-"], ["$", "$"], ["$$", "$$"], ["$$$", "$$$"]], e.price || "")}</select></label>
+          <label class="field">Yelp<input name="yelp" type="url" value="${esc(e.yelp)}" /></label>
+          <div class="edit-actions"><button class="btn-red">Save</button><button type="button" class="btn-line" data-cancel>Cancel</button></div>
+        </form>`;
     }
 
     function render() {
@@ -253,6 +281,32 @@
               x.classList.toggle("on", x.dataset.tried === String(tried)));
             const e = entries.find((x) => String(x.id) === String(id)); if (e) e.tried = tried;
           } catch (err) { alert(err.message); }
+        }));
+
+      const patch = (body) => api("/api/entries/" + id, { method: "PATCH", body: JSON.stringify(body) });
+
+      el.querySelector("[data-edit]").addEventListener("click", () => {
+        const e = entries.find((x) => String(x.id) === String(id));
+        el.insertAdjacentHTML("beforeend", editForm(e));
+        el.classList.add("editing");
+        const f = el.querySelector(".edit");
+        f.querySelector("[data-cancel]").addEventListener("click", () => { f.remove(); el.classList.remove("editing"); });
+        f.addEventListener("submit", async (ev) => {
+          ev.preventDefault();
+          f.querySelectorAll("button").forEach((x) => (x.disabled = true));
+          try { await patch(Object.fromEntries(new FormData(f))); load(); }
+          catch (err) { f.querySelectorAll("button").forEach((x) => (x.disabled = false)); alert(err.message); }
+        });
+      });
+
+      el.querySelectorAll("[data-use], [data-dismiss]").forEach((b) =>
+        b.addEventListener("click", async () => {
+          b.disabled = true;
+          try {
+            if (b.dataset.use) await patch({ description: b.closest(".sug").querySelector("b").textContent });
+            else await api("/api/suggestions/" + b.dataset.dismiss, { method: "DELETE" });
+            load();
+          } catch (err) { b.disabled = false; alert(err.message); }
         }));
 
       el.querySelectorAll("[data-act]").forEach((b) =>

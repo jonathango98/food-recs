@@ -71,7 +71,7 @@
       <div class="row2">
         <div class="field">
           <label for="cuisine">Cuisine <span class="req">*</span></label>
-          <input type="text" id="cuisine" required placeholder="e.g. Cafe" />
+          <select id="cuisine" required><option value="">Pick one</option></select>
         </div>
         <div class="field">
           <label for="loc">Neighborhood</label>
@@ -139,12 +139,14 @@
   </footer>
 
   <script src="../config.js"></script>
+  <script src="../cuisines.js"></script>
   <script>
   (function () {
     const API_BASE = window.API_BASE || "";
     const $ = (s) => document.querySelector(s);
     const form = $("#form"), msg = $("#msg"), submit = $("#submit");
     let price = "";
+    $("#cuisine").insertAdjacentHTML("beforeend", window.CUISINES.map((c) => `<option>${c}</option>`).join(""));
 
     $("#price").querySelectorAll("[data-price]").forEach((b) =>
       b.addEventListener("click", () => {

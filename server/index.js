@@ -2,7 +2,8 @@
 //   - Serves the static guide in ../app (so /admin and /entry work as routes).
 //   - Public  POST /api/entries        : submit a recommendation (status=pending).
 //   - Admin   GET   /api/entries        : list submissions (Basic Auth).
-//   - Admin   PATCH /api/entries/:id    : approve / reject (Basic Auth).
+//   - Admin   PATCH /api/entries/:id    : approve / reject / edit (Basic Auth).
+//   - Public  POST /api/entries/:id/suggestions : suggest a dish for a "chef's choice" place.
 //   - Admin   DELETE /api/entries/:id   : remove a submission (Basic Auth).
 require('./env');
 const path = require('path');
@@ -11,6 +12,7 @@ const db = require('./db');
 const { pool, init } = db;
 const { seedIfEmpty } = require('./seed');
 const { CITY_META, ORDER } = require('../build');
+const CUISINES = require('../app/cuisines');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -136,6 +138,7 @@ app.post('/api/entries', async (req, res) => {
     };
 
     if (!VALID_CITIES.has(row.city)) return res.status(400).json({ error: 'Pick a valid city.' });
+    if (!CUISINES.includes(row.cuisine)) return res.status(400).json({ error: 'Pick a cuisine from the list.' });
     // Every field except neighborhood (location) is required.
     const required = ['name', 'cuisine', 'description', 'price', 'yelp', 'submitted_by', 'note'];
     const missing = required.filter((f) => !row[f]);
@@ -175,7 +178,7 @@ app.get('/api/places', async (req, res) => {
     );
     const byCity = {};
     for (const r of rows) (byCity[r.city] = byCity[r.city] || []).push({
-      tried: r.tried, name: r.name, cuisine: r.cuisine, description: r.description,
+      id: r.id, tried: r.tried, name: r.name, cuisine: r.cuisine, description: r.description,
       location: r.location, price: r.price, yelp: r.yelp,
     });
 
@@ -219,10 +222,15 @@ app.get('/api/contributors', async (req, res) => {
 app.get('/api/entries', requireAdmin, async (req, res) => {
   try {
     const status = req.query.status;
-    const valid = ['pending', 'approved', 'rejected'].includes(status);
-    const { rows } = valid
-      ? await pool.query('SELECT * FROM entries WHERE status = $1 ORDER BY created_at DESC', [status])
-      : await pool.query('SELECT * FROM entries ORDER BY created_at DESC');
+    const where = ['pending', 'approved', 'rejected'].includes(status) ? 'WHERE e.status = $1'
+      : status === 'suggested' ? 'WHERE EXISTS (SELECT 1 FROM suggestions s WHERE s.entry_id = e.id)'
+      : '';
+    const { rows } = await pool.query(
+      `SELECT e.*, COALESCE((SELECT json_agg(json_build_object('id', s.id, 'dish', s.dish) ORDER BY s.created_at)
+                               FROM suggestions s WHERE s.entry_id = e.id), '[]') AS suggestions
+         FROM entries e ${where} ORDER BY e.created_at DESC`,
+      where.includes('$1') ? [status] : []
+    );
     res.json({ entries: rows });
   } catch (err) {
     console.error('GET /api/entries', err);
@@ -248,6 +256,23 @@ app.patch('/api/entries/:id', requireAdmin, async (req, res) => {
     if (b.tried !== undefined) {
       vals.push(b.tried === true); sets.push(`tried = $${vals.length}`);
     }
+    // Content edits. Only fields present in the body change.
+    const limits = { name: 200, cuisine: 80, description: 300, location: 120, yelp: 500 };
+    for (const [f, max] of Object.entries(limits)) {
+      if (b[f] === undefined) continue;
+      const v = str(b[f], max);
+      if ((f === 'name' || f === 'cuisine') && !v) return res.status(400).json({ error: `${f} can't be empty.` });
+      if (f === 'yelp' && v && !/^https?:\/\//i.test(v)) return res.status(400).json({ error: 'Yelp must be a valid URL.' });
+      vals.push(v); sets.push(`${f} = $${vals.length}`);
+    }
+    if (b.price !== undefined) {
+      if (!['', '$', '$$', '$$$'].includes(b.price)) return res.status(400).json({ error: 'Invalid price.' });
+      vals.push(b.price); sets.push(`price = $${vals.length}`);
+    }
+    if (b.city !== undefined) {
+      if (!VALID_CITIES.has(b.city)) return res.status(400).json({ error: 'Invalid city.' });
+      vals.push(b.city); sets.push(`city = $${vals.length}`);
+    }
     if (!sets.length) return res.status(400).json({ error: 'Nothing to update.' });
 
     vals.push(id);
@@ -256,6 +281,8 @@ app.patch('/api/entries/:id', requireAdmin, async (req, res) => {
       vals
     );
     if (!rows.length) return res.status(404).json({ error: 'Not found.' });
+    // Once a place has a dish, its pending dish suggestions are moot.
+    if (rows[0].description) await pool.query('DELETE FROM suggestions WHERE entry_id = $1', [id]);
     res.json({ ok: true, entry: rows[0] });
   } catch (err) {
     console.error('PATCH /api/entries/:id', err);
@@ -273,6 +300,37 @@ app.delete('/api/entries/:id', requireAdmin, async (req, res) => {
   } catch (err) {
     console.error('DELETE /api/entries/:id', err);
     res.status(500).json({ error: 'Could not delete submission.' });
+  }
+});
+
+// --- Public: suggest a dish for an approved place ---
+app.post('/api/entries/:id/suggestions', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const dish = str((req.body || {}).dish, 300);
+    if (!dish) return res.status(400).json({ error: 'Enter a dish.' });
+    const { rowCount } = await pool.query(
+      `INSERT INTO suggestions (entry_id, dish)
+         SELECT id, $2 FROM entries WHERE id = $1 AND status = 'approved'`,
+      [id, dish]
+    );
+    if (!rowCount) return res.status(404).json({ error: 'Not found.' });
+    res.status(201).json({ ok: true });
+  } catch (err) {
+    console.error('POST /api/entries/:id/suggestions', err);
+    res.status(500).json({ error: 'Could not save your suggestion.' });
+  }
+});
+
+// --- Admin: dismiss a dish suggestion ---
+app.delete('/api/suggestions/:id', requireAdmin, async (req, res) => {
+  try {
+    const { rowCount } = await pool.query('DELETE FROM suggestions WHERE id = $1', [parseInt(req.params.id, 10)]);
+    if (!rowCount) return res.status(404).json({ error: 'Not found.' });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('DELETE /api/suggestions/:id', err);
+    res.status(500).json({ error: 'Could not delete suggestion.' });
   }
 });
 

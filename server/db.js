@@ -37,6 +37,12 @@ const SCHEMA = `
   CREATE INDEX IF NOT EXISTS entries_status_idx ON entries (status, created_at DESC);
   -- Backfill for tables created before the opt-out flag existed.
   ALTER TABLE entries ADD COLUMN IF NOT EXISTS anonymous BOOLEAN NOT NULL DEFAULT FALSE;
+  CREATE TABLE IF NOT EXISTS suggestions (
+    id           SERIAL PRIMARY KEY,
+    entry_id     INTEGER NOT NULL REFERENCES entries(id) ON DELETE CASCADE,
+    dish         TEXT NOT NULL,
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
 `;
 
 async function init() {
