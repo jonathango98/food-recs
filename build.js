@@ -43,6 +43,16 @@ const CUISINE_FIXES = {
   'itallian': 'Italian',
   'mediterranian': 'Mediterranean',
   'caribean': 'Caribbean',
+  // Fold narrow labels into the broader list in app/cuisines.js.
+  'western': 'American',
+  'hawaiian': 'American',
+  'bakery': 'Dessert',
+  'pastry': 'Dessert',
+  'ice cream': 'Dessert',
+  'ramen': 'Japanese',
+  'korean-hawaiian': 'Korean',
+  'thai/indo': 'Thai',
+  'vietnamese-french': 'Vietnamese',
 };
 function cleanCuisine(raw) {
   let s = (raw || '').trim();

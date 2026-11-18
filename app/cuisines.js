@@ -3,8 +3,7 @@
   if (typeof module !== "undefined") module.exports = list;
   else window.CUISINES = list;
 })([
-  "American", "Asian Fusion", "Bakery", "Boba", "Brazilian", "Brunch", "Cafe", "Caribbean",
-  "Chinese", "Dessert", "Fine Dine", "Hawaiian", "Indian", "Indonesian", "Italian", "Japanese",
-  "Korean", "Malaysian", "Mediterranean", "Mexican", "Russian", "Taiwanese", "Thai",
-  "Vietnamese", "Western", "Other",
+  "American", "Asian Fusion", "Boba", "Brazilian", "Brunch", "Cafe", "Caribbean", "Chinese",
+  "Dessert", "Fine Dine", "Indian", "Indonesian", "Italian", "Japanese", "Korean", "Malaysian",
+  "Mediterranean", "Mexican", "Russian", "Taiwanese", "Thai", "Vietnamese",
 ]);

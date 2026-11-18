@@ -10,7 +10,7 @@ window.FOODIE_DATA = {
         {
           "tried": true,
           "name": "Porto's Bakery",
-          "cuisine": "Bakery",
+          "cuisine": "Dessert",
           "description": "Cheese Rolls",
           "location": "Los Angeles",
           "price": "$",
@@ -352,7 +352,7 @@ window.FOODIE_DATA = {
         {
           "tried": false,
           "name": "NEP Cafe",
-          "cuisine": "Vietnamese-French",
+          "cuisine": "Vietnamese",
           "description": "",
           "location": "Los Angeles",
           "price": "$$",
@@ -361,7 +361,7 @@ window.FOODIE_DATA = {
         {
           "tried": true,
           "name": "Howling Rays",
-          "cuisine": "Western",
+          "cuisine": "American",
           "description": "Spicy Chicken Sandwich",
           "location": "Los Angeles",
           "price": "$$",
@@ -379,7 +379,7 @@ window.FOODIE_DATA = {
         {
           "tried": true,
           "name": "Artichoke Basille's Pizza",
-          "cuisine": "Western",
+          "cuisine": "American",
           "description": "Artichoke Cream Pizza",
           "location": "Berkeley",
           "price": "$",
@@ -415,7 +415,7 @@ window.FOODIE_DATA = {
         {
           "tried": true,
           "name": "Sobo Ramen",
-          "cuisine": "Ramen",
+          "cuisine": "Japanese",
           "description": "Ramen",
           "location": "Berkeley",
           "price": "$$",
@@ -460,7 +460,7 @@ window.FOODIE_DATA = {
         {
           "tried": true,
           "name": "Rose Pizzeria",
-          "cuisine": "Western",
+          "cuisine": "American",
           "description": "Pizza",
           "location": "Berkeley",
           "price": "$$",
@@ -469,7 +469,7 @@ window.FOODIE_DATA = {
         {
           "tried": true,
           "name": "Saul's Restaurant & Delicatessen",
-          "cuisine": "Western",
+          "cuisine": "American",
           "description": "Pastrami Reuben",
           "location": "Berkeley",
           "price": "$$",
@@ -685,7 +685,7 @@ window.FOODIE_DATA = {
         {
           "tried": true,
           "name": "Arsicault",
-          "cuisine": "Bakery",
+          "cuisine": "Dessert",
           "description": "Croissant To Go",
           "location": "San Francisco",
           "price": "$",
@@ -694,7 +694,7 @@ window.FOODIE_DATA = {
         {
           "tried": true,
           "name": "B Patisserie",
-          "cuisine": "Bakery",
+          "cuisine": "Dessert",
           "description": "Kouign Amaan",
           "location": "San Francisco",
           "price": "$",
@@ -703,7 +703,7 @@ window.FOODIE_DATA = {
         {
           "tried": true,
           "name": "Pineapple King Bakery",
-          "cuisine": "Bakery",
+          "cuisine": "Dessert",
           "description": "Pineapple Bun",
           "location": "San Francisco",
           "price": "$",
@@ -712,7 +712,7 @@ window.FOODIE_DATA = {
         {
           "tried": true,
           "name": "Roli Roti",
-          "cuisine": "Western",
+          "cuisine": "American",
           "description": "Porchetta Sandwich",
           "location": "San Francisco",
           "price": "$$",
@@ -721,7 +721,7 @@ window.FOODIE_DATA = {
         {
           "tried": true,
           "name": "Boudin",
-          "cuisine": "Western",
+          "cuisine": "American",
           "description": "Chowder",
           "location": "San Francisco",
           "price": "$$",
@@ -739,7 +739,7 @@ window.FOODIE_DATA = {
         {
           "tried": true,
           "name": "House of Prime Ribs",
-          "cuisine": "Western",
+          "cuisine": "American",
           "description": "Prime Rib Steakhouse",
           "location": "San Francisco",
           "price": "$$$$",
@@ -811,7 +811,7 @@ window.FOODIE_DATA = {
         {
           "tried": true,
           "name": "Fish Restaurant",
-          "cuisine": "Western",
+          "cuisine": "American",
           "description": "Fish & Chips",
           "location": "Sausalito",
           "price": "$$",
@@ -973,7 +973,7 @@ window.FOODIE_DATA = {
         {
           "tried": true,
           "name": "Katz's Delicatessen",
-          "cuisine": "Western",
+          "cuisine": "American",
           "description": "Roast Beef Sandwich",
           "location": "Chinatown, NY",
           "price": "$$",
@@ -982,7 +982,7 @@ window.FOODIE_DATA = {
         {
           "tried": true,
           "name": "Peter Luger",
-          "cuisine": "Western",
+          "cuisine": "American",
           "description": "Steakhouse",
           "location": "Brooklyn, NY",
           "price": "$$$$",
@@ -991,7 +991,7 @@ window.FOODIE_DATA = {
         {
           "tried": true,
           "name": "Chelsea Market",
-          "cuisine": "Western",
+          "cuisine": "American",
           "description": "Seafood Market",
           "location": "Chelsea, NY",
           "price": "$$",
@@ -1045,7 +1045,7 @@ window.FOODIE_DATA = {
         {
           "tried": false,
           "name": "Maonos",
-          "cuisine": "Korean-Hawaiian",
+          "cuisine": "Korean",
           "description": "Chicken Sandwich, Fried Chicken",
           "location": "University Village, Downtown",
           "price": "$",
@@ -1063,7 +1063,7 @@ window.FOODIE_DATA = {
         {
           "tried": false,
           "name": "Hiroshi Poke",
-          "cuisine": "Hawaiian",
+          "cuisine": "American",
           "description": "Poke",
           "location": "University District",
           "price": "$$",
@@ -1072,7 +1072,7 @@ window.FOODIE_DATA = {
         {
           "tried": true,
           "name": "FOB Poke",
-          "cuisine": "Hawaiian",
+          "cuisine": "American",
           "description": "Poke",
           "location": "Downtown, Bellevue",
           "price": "$$",
@@ -1171,7 +1171,7 @@ window.FOODIE_DATA = {
         {
           "tried": true,
           "name": "Pike place chowder",
-          "cuisine": "Other",
+          "cuisine": "American",
           "description": "Clam",
           "location": "Downtown",
           "price": "$$",
@@ -1333,7 +1333,7 @@ window.FOODIE_DATA = {
         {
           "tried": false,
           "name": "Sweet Alchemy",
-          "cuisine": "Ice Cream",
+          "cuisine": "Dessert",
           "description": "Thai Tea Ice Cream",
           "location": "",
           "price": "",
@@ -1342,7 +1342,7 @@ window.FOODIE_DATA = {
         {
           "tried": false,
           "name": "Rice n Spice",
-          "cuisine": "Thai/Indo",
+          "cuisine": "Thai",
           "description": "",
           "location": "Bellevue",
           "price": "",
@@ -1495,7 +1495,7 @@ window.FOODIE_DATA = {
         {
           "tried": false,
           "name": "Bakery Noveau",
-          "cuisine": "Pastry",
+          "cuisine": "Dessert",
           "description": "",
           "location": "",
           "price": "",

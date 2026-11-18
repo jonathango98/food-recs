@@ -73,6 +73,7 @@
         <div class="field">
           <label for="cuisine">Cuisine <span class="req">*</span></label>
           <select id="cuisine" required><option value="">Pick one</option></select>
+          <input type="text" id="cuisineOther" maxlength="80" placeholder="Which cuisine?" aria-label="Other cuisine" hidden />
         </div>
         <div class="field">
           <label for="loc">Neighborhood</label>
@@ -152,7 +153,9 @@
     const $ = (s) => document.querySelector(s);
     const form = $("#form"), msg = $("#msg"), submit = $("#submit");
     let price = "";
-    $("#cuisine").insertAdjacentHTML("beforeend", window.CUISINES.map((c) => `<option>${c}</option>`).join(""));
+    $("#cuisine").insertAdjacentHTML("beforeend", [...window.CUISINES, "Other"].map((c) => `<option>${c}</option>`).join(""));
+    const syncOther = () => { const o = $("#cuisineOther"); o.hidden = $("#cuisine").value !== "Other"; o.required = !o.hidden; };
+    $("#cuisine").addEventListener("change", syncOther);
 
     $("#price").querySelectorAll("[data-price]").forEach((b) =>
       b.addEventListener("click", () => {
@@ -190,7 +193,7 @@
       if (!price) { msg.className = "msg err"; msg.textContent = "Pick a price."; return; }
 
       const payload = {
-        city: $("#city").value, name: val("name"), cuisine: val("cuisine"),
+        city: $("#city").value, name: val("name"), cuisine: val("cuisine") === "Other" ? val("cuisineOther") : val("cuisine"),
         description: val("desc"), location: val("loc"), price,
         yelp: val("yelp"), submitted_by: val("by"), note: val("note"),
         anonymous: $("#anon").checked, website: val("website"),
@@ -215,7 +218,7 @@
     });
 
     $("#again").addEventListener("click", () => {
-      form.reset(); price = "";
+      form.reset(); price = ""; syncOther();
       $("#price").querySelectorAll("[data-price]").forEach((x) => x.setAttribute("aria-pressed", "false"));
       dupHint.className = "hint"; dupHint.textContent = "";
       msg.textContent = ""; form.hidden = false; $("#done").hidden = true;

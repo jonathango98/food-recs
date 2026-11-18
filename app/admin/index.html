@@ -22,6 +22,7 @@
   .msg.err { color: var(--red); font-weight: 600; }
 
   .tabs { display: flex; gap: 8px; padding-top: 16px; padding-bottom: 6px; overflow-x: auto; }
+  .filters { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; padding-bottom: 6px; }
   .chip .n { font-variant-numeric: tabular-nums; opacity: .7; }
   .menu-h { margin-top: 22px; }
   .menu-h .ct { font-size: .5em; font-variation-settings: "wdth" 100; color: var(--soft); margin-left: 6px; }
@@ -100,6 +101,12 @@
         <button class="chip tab" data-status="rejected" aria-pressed="false">Rejected <span class="n" id="n-rejected"></span></button>
         <button class="chip tab" data-status="suggested" aria-pressed="false">Suggested <span class="n" id="n-suggested"></span></button>
         <button class="chip tab" data-status="all"      aria-pressed="false">All</button>
+      </div>
+      <div class="field filters" id="filters">
+        <input type="search" id="fq" placeholder="Search" aria-label="Search" autocomplete="off" />
+        <select id="fcity" aria-label="City"><option value="">All cities</option></select>
+        <select id="fcuisine" aria-label="Cuisine"><option value="">All cuisines</option></select>
+        <select id="ftried" aria-label="Tried"><option value="">Tried or not</option><option value="true">Tried</option><option value="false">Not yet</option></select>
       </div>
       <div class="list" id="list" aria-live="polite"></div>
     </div>
@@ -182,6 +189,17 @@
         load();
       }));
 
+    // ---- Filters (client-side, over the loaded tab) ----
+    $("#fcity").insertAdjacentHTML("beforeend", Object.entries(CITY).map(([id, c]) => `<option value="${id}">${c.name}</option>`).join(""));
+    $("#fcuisine").insertAdjacentHTML("beforeend", window.CUISINES.map((c) => `<option>${c}</option>`).join(""));
+    $("#filters").addEventListener("input", () => render());
+
+    function shown() {
+      const q = $("#fq").value.trim().toLowerCase(), city = $("#fcity").value, cu = $("#fcuisine").value, tr = $("#ftried").value;
+      return entries.filter((e) => (!city || e.city === city) && (!cu || e.cuisine === cu) && (!tr || String(e.tried) === tr) &&
+        (!q || [e.name, e.description, e.location, e.cuisine, e.submitted_by, e.note].join(" ").toLowerCase().includes(q)));
+    }
+
     // ---- Load + render ----
     async function load() {
       $("#list").innerHTML = `<p class="hint">Loading...</p>`;
@@ -238,14 +256,15 @@
 
     function editForm(e) {
       const opts = (pairs, cur) => pairs.map(([v, l]) => `<option value="${esc(v)}"${v === cur ? " selected" : ""}>${esc(l)}</option>`).join("");
-      // A pre-dropdown cuisine (e.g. "Ramen") stays selectable so other edits don't silently change it.
-      const cuisines = window.CUISINES.map((c) => [c, c]);
-      if (e.cuisine && !window.CUISINES.includes(e.cuisine)) cuisines.unshift([e.cuisine, e.cuisine + " (old)"]);
+      // An off-list cuisine shows as "Other" with its text prefilled.
+      const custom = e.cuisine && !window.CUISINES.includes(e.cuisine) ? e.cuisine : "";
+      const cuisines = [...window.CUISINES, "Other"].map((c) => [c, c]);
       return `
         <form class="edit">
           <label class="field">Place<input name="name" required value="${esc(e.name)}" /></label>
           <label class="field">Dish<input name="description" value="${esc(e.description)}" placeholder="Chef’s choice" /></label>
-          <label class="field">Cuisine<select name="cuisine">${opts(cuisines, e.cuisine)}</select></label>
+          <label class="field">Cuisine<select name="cuisine">${opts(cuisines, custom ? "Other" : e.cuisine)}</select>
+            <input name="cuisineOther" maxlength="80" placeholder="Which cuisine?" aria-label="Other cuisine" value="${esc(custom)}"${custom ? " required" : " hidden"} /></label>
           <label class="field">City<select name="city">${opts(Object.entries(CITY).map(([id, c]) => [id, c.name]), e.city)}</select></label>
           <label class="field">Neighborhood<input name="location" value="${esc(e.location)}" /></label>
           <label class="field">Price<select name="price">${opts([["", "-"], ["$", "$"], ["$$", "$$"], ["$$$", "$$$"]], e.price || "")}</select></label>
@@ -255,18 +274,19 @@
     }
 
     function render() {
-      if (!entries.length) {
-        $("#list").innerHTML = `<div class="empty"><h2>Empty</h2><p>No ${tab === "all" ? "" : tab + " "}submissions.</p></div>`;
+      const list = shown();
+      if (!list.length) {
+        $("#list").innerHTML = `<div class="empty"><h2>Empty</h2><p>${entries.length ? "Nothing matches these filters." : `No ${tab === "all" ? "" : tab + " "}submissions.`}</p></div>`;
         return;
       }
       let html = "";
       if (tab === "all") {
         let n = 0;
         for (const s of ["pending", "approved", "rejected"]) {
-          const g = entries.filter((e) => e.status === s);
+          const g = list.filter((e) => e.status === s);
           if (g.length) html += `<h2 class="menu-h">${s}<span class="ct">${g.length}</span></h2>` + g.map((e) => card(e, n++)).join("");
         }
-      } else html = entries.map(card).join("");
+      } else html = list.map(card).join("");
       $("#list").innerHTML = html;
       $("#list").querySelectorAll(".it").forEach(wire);
     }
@@ -292,10 +312,14 @@
         el.classList.add("editing");
         const f = el.querySelector(".edit");
         f.querySelector("[data-cancel]").addEventListener("click", () => { f.remove(); el.classList.remove("editing"); });
+        const sel = f.elements.cuisine, other = f.elements.cuisineOther;
+        sel.addEventListener("change", () => { other.hidden = sel.value !== "Other"; other.required = !other.hidden; });
         f.addEventListener("submit", async (ev) => {
           ev.preventDefault();
           f.querySelectorAll("button").forEach((x) => (x.disabled = true));
-          try { await patch(Object.fromEntries(new FormData(f))); load(); }
+          const body = Object.fromEntries(new FormData(f));
+          if (body.cuisine === "Other") body.cuisine = body.cuisineOther;
+          try { await patch(body); load(); }
           catch (err) { f.querySelectorAll("button").forEach((x) => (x.disabled = false)); alert(err.message); }
         });
       });

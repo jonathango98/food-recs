@@ -11,8 +11,7 @@ const express = require('express');
 const db = require('./db');
 const { pool, init } = db;
 const { seedIfEmpty } = require('./seed');
-const { CITY_META, ORDER } = require('../build');
-const CUISINES = require('../app/cuisines');
+const { CITY_META, ORDER, cleanCuisine } = require('../build');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -192,7 +191,8 @@ app.post('/api/entries', (req, res, next) => (isAdmin(req) ? next() : submitLimi
     };
 
     if (!VALID_CITIES.has(row.city)) return res.status(400).json({ error: 'Pick a valid city.' });
-    if (!CUISINES.includes(row.cuisine)) return res.status(400).json({ error: 'Pick a cuisine from the list.' });
+    // Free text allowed via "Other"; cleanCuisine folds known labels (e.g. "ramen") onto the list.
+    if (row.cuisine) row.cuisine = cleanCuisine(row.cuisine);
     // Every field except neighborhood (location) and note is required.
     const required = ['name', 'cuisine', 'description', 'price', 'yelp', 'submitted_by'];
     const missing = required.filter((f) => !row[f]);
