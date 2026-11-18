@@ -25,7 +25,28 @@ for (const meta of Object.values(CITY_META)) CITY_BY_ID[meta.id] = meta;
 const ADMIN_USER = process.env.ADMIN_USER || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 
+// Railway sits one proxy hop in front of us; this makes req.ip the real client IP.
+app.set('trust proxy', 1);
 app.use(express.json({ limit: '64kb' }));
+
+// Per-IP fixed-window rate limit for public endpoints.
+// shortcut: in-memory, resets on restart and isn't shared across instances; swap for
+// express-rate-limit + a shared store if the API ever runs on more than one instance.
+function rateLimit(max, windowMs) {
+  const hits = new Map(); // ip -> { n, reset }
+  return (req, res, next) => {
+    const now = Date.now();
+    if (hits.size > 10000) for (const [k, v] of hits) if (v.reset <= now) hits.delete(k);
+    let h = hits.get(req.ip);
+    if (!h || h.reset <= now) hits.set(req.ip, (h = { n: 0, reset: now + windowMs }));
+    if (++h.n > max) {
+      res.set('Retry-After', String(Math.ceil((h.reset - now) / 1000)));
+      return res.status(429).json({ error: 'Too many requests. Try again later.' });
+    }
+    next();
+  };
+}
+const HOUR = 60 * 60 * 1000;
 
 // --- CORS (lets a separately-hosted frontend, e.g. Netlify, call the API) ---
 const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
@@ -57,6 +78,36 @@ function requireAdmin(req, res, next) {
 }
 
 const VALID_CITIES = new Set(['la', 'sf', 'ny', 'sea']);
+
+// Accept only Yelp business pages, trimmed to https://www.yelp.com/biz/<slug>
+// (drops ?osq=…, #…, /photos; /biz_photos/ and /menu/<slug> map to /biz/<slug>). yelp.to app-share links are followed to that page.
+// Returns '' when it isn't a business page. Can't confirm it's a *restaurant*:
+// yelp.com blocks server fetches (403), so admin review covers that.
+const YELP_ERROR = 'Paste the Yelp page for the place (yelp.com/biz/…).';
+function cleanYelpBiz(s) {
+  try {
+    const u = new URL(s);
+    const m = u.pathname.match(/^\/(?:biz|biz_photos|menu)\/([^/]+)/);
+    if (!/^https?:$/.test(u.protocol) || !/(^|\.)yelp\.com$/i.test(u.hostname) || !m) return '';
+    return `https://www.yelp.com/biz/${m[1]}`;
+  } catch { return ''; }
+}
+async function yelpLink(s) {
+  try {
+    let url = s;
+    for (let hop = 0; hop < 3; hop++) {
+      const clean = cleanYelpBiz(url);
+      if (clean) return clean;
+      const u = new URL(url);
+      if (!/^yelp\.to$/i.test(u.hostname)) return ''; // only ever fetch yelp.to
+      const r = await fetch(u, { redirect: 'manual', signal: AbortSignal.timeout(5000) });
+      const next = r.headers.get('location');
+      if (!next) return '';
+      url = new URL(next, u).href;
+    }
+  } catch { /* bad URL or network error */ }
+  return '';
+}
 const str = (v, max = 500) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 
 // The original crew, already in {first}.{last initial} form. Public submitters
@@ -104,7 +155,7 @@ function findDuplicate(city, name) {
 }
 
 // --- Public: has this place already been suggested / added? ---
-app.get('/api/entries/check', async (req, res) => {
+app.get('/api/entries/check', rateLimit(60, 60 * 1000), async (req, res) => {
   try {
     const city = str(req.query.city, 8);
     const name = str(req.query.name, 200);
@@ -118,11 +169,14 @@ app.get('/api/entries/check', async (req, res) => {
   }
 });
 
-// --- Public: submit a recommendation (all fields required) ---
-app.post('/api/entries', async (req, res) => {
+// --- Public: submit a recommendation (neighborhood and note optional) ---
+const submitLimit = rateLimit(15, HOUR);
+app.post('/api/entries', (req, res, next) => (isAdmin(req) ? next() : submitLimit(req, res, next)), async (req, res) => {
   try {
     const b = req.body || {};
     const admin = isAdmin(req);
+    // Honeypot filled in = bot. Pretend success so it doesn't retry.
+    if (!admin && b.website) return res.status(201).json({ ok: true });
 
     const row = {
       city: str(b.city, 8),
@@ -139,11 +193,12 @@ app.post('/api/entries', async (req, res) => {
 
     if (!VALID_CITIES.has(row.city)) return res.status(400).json({ error: 'Pick a valid city.' });
     if (!CUISINES.includes(row.cuisine)) return res.status(400).json({ error: 'Pick a cuisine from the list.' });
-    // Every field except neighborhood (location) is required.
-    const required = ['name', 'cuisine', 'description', 'price', 'yelp', 'submitted_by', 'note'];
+    // Every field except neighborhood (location) and note is required.
+    const required = ['name', 'cuisine', 'description', 'price', 'yelp', 'submitted_by'];
     const missing = required.filter((f) => !row[f]);
     if (missing.length) return res.status(400).json({ error: `Missing required field(s): ${missing.join(', ')}.` });
-    if (!/^https?:\/\//i.test(row.yelp)) return res.status(400).json({ error: 'Yelp must be a valid URL.' });
+    row.yelp = await yelpLink(row.yelp);
+    if (!row.yelp) return res.status(400).json({ error: YELP_ERROR });
 
     // Note: possible duplicates are surfaced to the submitter as a warning via
     // GET /api/entries/check, not blocked here — fuzzy matching can false-positive,
@@ -260,9 +315,9 @@ app.patch('/api/entries/:id', requireAdmin, async (req, res) => {
     const limits = { name: 200, cuisine: 80, description: 300, location: 120, yelp: 500 };
     for (const [f, max] of Object.entries(limits)) {
       if (b[f] === undefined) continue;
-      const v = str(b[f], max);
+      let v = str(b[f], max);
       if ((f === 'name' || f === 'cuisine') && !v) return res.status(400).json({ error: `${f} can't be empty.` });
-      if (f === 'yelp' && v && !/^https?:\/\//i.test(v)) return res.status(400).json({ error: 'Yelp must be a valid URL.' });
+      if (f === 'yelp' && v && !(v = await yelpLink(v))) return res.status(400).json({ error: YELP_ERROR });
       vals.push(v); sets.push(`${f} = $${vals.length}`);
     }
     if (b.price !== undefined) {
@@ -304,7 +359,7 @@ app.delete('/api/entries/:id', requireAdmin, async (req, res) => {
 });
 
 // --- Public: suggest a dish for an approved place ---
-app.post('/api/entries/:id/suggestions', async (req, res) => {
+app.post('/api/entries/:id/suggestions', rateLimit(20, HOUR), async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
     const dish = str((req.body || {}).dish, 300);

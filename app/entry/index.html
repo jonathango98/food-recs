@@ -101,8 +101,13 @@
       </div>
 
       <div class="field">
-        <label for="note">Why go <span class="req">*</span></label>
-        <textarea id="note" required placeholder="What makes it worth the trip?"></textarea>
+        <label for="note">Why go</label>
+        <textarea id="note" placeholder="What makes it worth the trip?"></textarea>
+      </div>
+
+      <!-- Honeypot: hidden from people, bots fill it and get silently dropped. -->
+      <div aria-hidden="true" style="position:absolute;left:-9999px">
+        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
       </div>
 
       <h2 class="menu-h">From you</h2>
@@ -187,7 +192,7 @@
         city: $("#city").value, name: val("name"), cuisine: val("cuisine"),
         description: val("desc"), location: val("loc"), price,
         yelp: val("yelp"), submitted_by: val("by"), note: val("note"),
-        anonymous: $("#anon").checked,
+        anonymous: $("#anon").checked, website: val("website"),
       };
 
       submit.disabled = true; msg.textContent = "Sending…";
