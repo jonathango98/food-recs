@@ -18,7 +18,7 @@ OWN-WORLD: White offset-paper ground, one red ink (#C8102E) owning the masthead 
 
 STORY: A friend texted the link, sees the city's menu, scans cuisine sections, spots circled numbers (tried, vouched for), taps Yelp, goes.
 
-FIRST VIEWPORT: Red band with condensed THE LIST and "+ Add a spot"; city tabs on a red rule; search; status + price chips with "23 of 40 tried"; then the first cuisine header and numbered dish lines.
+FIRST VIEWPORT: Red band with condensed THE LIST and "+ Add a spot"; city tabs on a red rule; search + Filters button (sheet: status, price, multi-select cuisine) with "23 of 40 tried"; then the first cuisine header and numbered dish lines.
 
 FORM: Takeout Menu, candidate 1 of 7 on my ordered list (Impeccable's pick, user-chosen), seed:e513e3275c50ef7d. Signature move: blue ballpoint circles drawn around tried numbers.
 

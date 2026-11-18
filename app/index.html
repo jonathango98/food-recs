@@ -49,10 +49,50 @@
   .search input::placeholder { color: var(--soft); }
   .search input:focus-visible { outline: 2px solid var(--pen); outline-offset: 2px; }
 
-  .chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 2px 16px; }
-  .chips::-webkit-scrollbar { display: none; }
-  @media (min-width: 760px) { .chips { flex-wrap: wrap; overflow: visible; margin: 0; padding: 2px 0; } }
-  .chips .sep { flex: none; width: 1.5px; background: var(--rule); margin: 4px 4px; }
+  .find { display: flex; gap: 8px; }
+  .find .search { flex: 1; min-width: 0; }
+  .fbtn {
+    flex: none; display: inline-flex; align-items: center; gap: 8px; height: 46px; padding: 0 14px; cursor: pointer;
+    font: 600 1rem var(--sans); color: var(--ink); background: #fff; border: 1.5px solid var(--ink); border-radius: 8px;
+    transition: background-color .15s ease, color .15s ease;
+  }
+  .fbtn:hover:not(:disabled) { background: var(--ink); color: #fff; }
+  .fbtn:disabled { opacity: .45; cursor: default; }
+  .fbtn svg { width: 18px; height: 18px; flex: none; }
+  .badge {
+    min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: var(--red); color: #fff;
+    font: 700 .8rem/22px var(--sans); font-variant-numeric: tabular-nums; text-align: center;
+  }
+
+  /* ---------- Filter sheet: bottom sheet on phones, centered panel on wide screens ---------- */
+  .sheet {
+    width: 100%; max-width: none; max-height: min(88dvh, 760px); margin: auto 0 0; padding: 0; border: 0;
+    border-radius: 14px 14px 0 0; background: var(--paper); color: var(--ink); flex-direction: column; overflow: hidden;
+  }
+  .sheet[open] { display: flex; animation: sheet-up .36s cubic-bezier(.16,1,.3,1); }
+  .sheet::backdrop { background: rgb(20 20 20 / .5); }
+  @keyframes sheet-up { from { transform: translateY(100%); } }
+  @keyframes sheet-in { from { transform: translateY(16px); opacity: 0; } }
+  @media (min-width: 760px) {
+    .sheet { margin: auto; width: min(560px, calc(100% - 64px)); border-radius: 12px; }
+    .sheet[open] { animation-name: sheet-in; }
+  }
+  html:has(.sheet[open]) { overflow: hidden; }
+  .sheet-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 16px 12px; border-bottom: 2px solid var(--red); }
+  .sheet-head h2 { margin: 0; color: var(--red); font: 900 2rem/1 var(--sans); font-variation-settings: "wdth" 62; text-transform: uppercase; }
+  .x { width: 44px; height: 44px; margin-right: -6px; display: grid; place-items: center; background: none; border: 0; border-radius: 8px; color: var(--ink); cursor: pointer; }
+  .x:hover { background: var(--rule); }
+  .x svg { width: 22px; height: 22px; }
+  .sheet-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 16px 22px; }
+  .fgroup { border: 0; margin: 24px 0 0; padding: 0; min-width: 0; }
+  .fgroup legend { padding: 0; margin-bottom: 12px; font: 700 1.05rem/1 var(--sans); font-variation-settings: "wdth" 80; text-transform: uppercase; }
+  .fchips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .sheet .chip { min-height: 44px; padding: 0 16px; font-size: .95rem; }
+  .sheet-foot {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 12px 16px max(12px, env(safe-area-inset-bottom)); border-top: 1.5px solid var(--rule);
+  }
+  .sheet-foot .btn-red { min-width: 150px; font-variant-numeric: tabular-nums; }
 
   .tally { display: flex; align-items: center; gap: 12px; font-size: .95rem; color: var(--soft); font-variant-numeric: tabular-nums; }
   .tally b { color: var(--ink); font-weight: 700; }
@@ -117,11 +157,16 @@
 
   <main class="wrap">
     <div class="tools">
-      <label class="search">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        <input id="search" type="search" placeholder="Search a dish, place or area" autocomplete="off" aria-label="Search" />
-      </label>
-      <div class="chips" id="chips" role="group" aria-label="Filters"></div>
+      <div class="find">
+        <label class="search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input id="search" type="search" placeholder="Search a dish, place or area" autocomplete="off" aria-label="Search" />
+        </label>
+        <button class="fbtn" id="filterBtn" type="button" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h9M19 7h1M4 17h3M13 17h7"/><circle cx="16" cy="7" r="2.5"/><circle cx="10" cy="17" r="2.5"/></svg>
+          <span>Filters</span><span class="badge" id="filterCount" hidden></span>
+        </button>
+      </div>
       <div class="tally">
         <span><b id="progNum">0</b> of <span id="progTot">0</span> tried</span>
         <span class="bar" aria-hidden="true"><span id="progBar" style="width:0%"></span></span>
@@ -131,6 +176,20 @@
 
     <div class="menu" id="menu" aria-live="polite"></div>
   </main>
+
+  <dialog class="sheet" id="sheet" aria-labelledby="sheetTitle">
+    <div class="sheet-head">
+      <h2 id="sheetTitle">Filters</h2>
+      <button class="x" id="sheetClose" type="button" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body" id="sheetBody"></div>
+    <div class="sheet-foot">
+      <button class="clear" id="sheetClear" type="button">Clear</button>
+      <button class="btn-red" id="sheetApply" type="button">Show</button>
+    </div>
+  </dialog>
 
   <footer class="foot">
     <div class="wrap foot-in">
@@ -145,7 +204,7 @@
   (function () {
     const API_BASE = window.API_BASE || "";
     let DATA = [];
-    const state = { city: undefined, q: "", status: "all", cuisine: null, price: null };
+    const state = { city: undefined, q: "", status: "all", cuisines: [], price: null };
 
     const $ = (s) => document.querySelector(s);
     const menu = $("#menu");
@@ -179,12 +238,12 @@
 
     function setCity(id) {
       state.city = id;
-      state.cuisine = null; state.price = null; state.q = ""; state.status = "all";
+      state.cuisines = []; state.price = null; state.q = ""; state.status = "all";
       $("#search").value = "";
       document.querySelectorAll(".tab").forEach((b) =>
         b.setAttribute("aria-selected", b.dataset.city === id));
       renderCityHead();
-      renderChips();
+      syncFilterBtn();
       render(true);
     }
 
@@ -196,45 +255,75 @@
       $("#progBar").style.width = (c.count ? (tried / c.count) * 100 : 0) + "%";
     }
 
-    // ---- Status, price + cuisine chips ----
-    function renderChips() {
+    // ---- Filter sheet: edits a draft; "Show" applies it, any other close discards it ----
+    const sheet = $("#sheet");
+    let draft = null;
+
+    function syncFilterBtn() {
+      const n = (state.status !== "all") + !!state.price + state.cuisines.length;
+      const badge = $("#filterCount");
+      badge.hidden = !n;
+      badge.textContent = n;
+      $("#filterBtn").setAttribute("aria-label", n ? `Filters, ${n} on` : "Filters");
+      $("#filterBtn").disabled = !cityById(state.city).count;
+    }
+
+    function openSheet() {
       const c = cityById(state.city);
-      const cuisines = [...new Set(c.places.map((p) => p.cuisine).filter(Boolean))].sort((a, b) => a.localeCompare(b));
-      const prices = [...new Set(c.places.map((p) => p.price).filter(Boolean))].sort((a, b) => a.length - b.length);
+      draft = { status: state.status, price: state.price, cuisines: [...state.cuisines] };
+      const uniq = (k) => [...new Set(c.places.map((p) => p[k]).filter(Boolean))];
+      const prices = uniq("price").sort((a, b) => a.length - b.length);
+      const cuisines = uniq("cuisine").sort((a, b) => a.localeCompare(b));
       const chip = (kind, val, label) =>
-        `<button class="chip" data-kind="${kind}" data-val="${esc(val)}" aria-pressed="false">${esc(label)}</button>`;
-
-      $("#chips").innerHTML =
-        chip("status", "want", "Not yet") + chip("status", "tried", "Tried") +
-        `<span class="sep" aria-hidden="true"></span>` +
-        prices.map((pr) => chip("price", pr, pr)).join("") +
-        `<span class="sep" aria-hidden="true"></span>` +
-        cuisines.map((cu) => chip("cuisine", cu, cu)).join("");
-
-      $("#chips").querySelectorAll(".chip").forEach((b) =>
-        b.addEventListener("click", () => {
-          const k = b.dataset.kind, v = b.dataset.val;
-          const off = k === "status" ? "all" : null;
-          state[k] = state[k] === v ? off : v;
-          syncChips();
-          render();
-        }));
-      syncChips();
+        `<button type="button" class="chip" data-kind="${kind}" data-val="${esc(val)}">${esc(label)}</button>`;
+      const group = (title, chips) => chips ? `<fieldset class="fgroup"><legend>${title}</legend><div class="fchips">${chips}</div></fieldset>` : "";
+      $("#sheetBody").innerHTML =
+        group("Status", chip("status", "want", "Not yet") + chip("status", "tried", "Tried")) +
+        group("Price", prices.map((pr) => chip("price", pr, pr)).join("")) +
+        group("Cuisine", cuisines.map((cu) => chip("cuisines", cu, cu)).join(""));
+      syncSheet();
+      sheet.showModal();
     }
 
-    function syncChips() {
-      $("#chips").querySelectorAll(".chip").forEach((b) =>
-        b.setAttribute("aria-pressed", state[b.dataset.kind] === b.dataset.val));
+    function syncSheet() {
+      sheet.querySelectorAll(".chip").forEach((b) => {
+        const k = b.dataset.kind, v = b.dataset.val;
+        b.setAttribute("aria-pressed", k === "cuisines" ? draft.cuisines.includes(v) : draft[k] === v);
+      });
+      const n = filtered({ ...state, ...draft }).length;
+      const go = $("#sheetApply");
+      go.disabled = !n;
+      go.textContent = n ? `Show ${n}` : "No matches";
     }
+
+    $("#sheetBody").addEventListener("click", (e) => {
+      const b = e.target.closest(".chip");
+      if (!b) return;
+      const k = b.dataset.kind, v = b.dataset.val;
+      if (k === "cuisines") draft.cuisines = draft.cuisines.includes(v) ? draft.cuisines.filter((x) => x !== v) : [...draft.cuisines, v];
+      else draft[k] = draft[k] === v ? (k === "status" ? "all" : null) : v;
+      syncSheet();
+    });
+    $("#filterBtn").addEventListener("click", openSheet);
+    $("#sheetClose").addEventListener("click", () => sheet.close());
+    $("#sheetClear").addEventListener("click", () => { draft = { status: "all", price: null, cuisines: [] }; syncSheet(); });
+    $("#sheetApply").addEventListener("click", () => {
+      Object.assign(state, draft);
+      sheet.close();
+      syncFilterBtn();
+      render();
+    });
+    // Clicks on the dialog element itself land on the backdrop.
+    sheet.addEventListener("click", (e) => { if (e.target === sheet) sheet.close(); });
 
     // ---- Filtering + render ----
-    function filtered() {
-      const q = state.q.trim().toLowerCase();
-      return numbered(cityById(state.city)).filter((p) => {
-        if (state.status === "tried" && !p.tried) return false;
-        if (state.status === "want" && p.tried) return false;
-        if (state.cuisine && p.cuisine !== state.cuisine) return false;
-        if (state.price && p.price !== state.price) return false;
+    function filtered(f = state) {
+      const q = f.q.trim().toLowerCase();
+      return numbered(cityById(f.city)).filter((p) => {
+        if (f.status === "tried" && !p.tried) return false;
+        if (f.status === "want" && p.tried) return false;
+        if (f.cuisines.length && !f.cuisines.includes(p.cuisine)) return false;
+        if (f.price && p.price !== f.price) return false;
         if (q) {
           const hay = `${p.name} ${p.description} ${p.cuisine} ${p.location}`.toLowerCase();
           if (!hay.includes(q)) return false;
@@ -275,7 +364,7 @@
     function render(draw) {
       const list = filtered();
       const c = cityById(state.city);
-      const anyFilter = state.q || state.status !== "all" || state.cuisine || state.price;
+      const anyFilter = state.q || state.status !== "all" || state.cuisines.length || state.price;
 
       if (!c.count) {
         menu.className = "menu";
@@ -317,9 +406,9 @@
     }
 
     function clearAll() {
-      state.q = ""; state.status = "all"; state.cuisine = null; state.price = null;
+      state.q = ""; state.status = "all"; state.cuisines = []; state.price = null;
       $("#search").value = "";
-      syncChips();
+      syncFilterBtn();
       render();
     }
 
@@ -357,7 +446,7 @@
       $("#footTotal").textContent = DATA.reduce((n, c) => n + c.count, 0);
       renderCities();
       renderCityHead();
-      renderChips();
+      syncFilterBtn();
       render(true);
     }
 
