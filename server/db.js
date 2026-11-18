@@ -43,6 +43,7 @@ const SCHEMA = `
     dish         TEXT NOT NULL,
     created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
   );
+  ALTER TABLE suggestions ADD COLUMN IF NOT EXISTS submitted_by TEXT;
 `;
 
 async function init() {

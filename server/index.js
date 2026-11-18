@@ -281,7 +281,7 @@ app.get('/api/entries', requireAdmin, async (req, res) => {
       : status === 'suggested' ? 'WHERE EXISTS (SELECT 1 FROM suggestions s WHERE s.entry_id = e.id)'
       : '';
     const { rows } = await pool.query(
-      `SELECT e.*, COALESCE((SELECT json_agg(json_build_object('id', s.id, 'dish', s.dish) ORDER BY s.created_at)
+      `SELECT e.*, COALESCE((SELECT json_agg(json_build_object('id', s.id, 'dish', s.dish, 'submitted_by', s.submitted_by) ORDER BY s.created_at)
                                FROM suggestions s WHERE s.entry_id = e.id), '[]') AS suggestions
          FROM entries e ${where} ORDER BY e.created_at DESC`,
       where.includes('$1') ? [status] : []
@@ -363,11 +363,13 @@ app.post('/api/entries/:id/suggestions', rateLimit(20, HOUR), async (req, res) =
   try {
     const id = parseInt(req.params.id, 10);
     const dish = str((req.body || {}).dish, 300);
+    const by = str((req.body || {}).submitted_by, 120);
     if (!dish) return res.status(400).json({ error: 'Enter a dish.' });
+    if (!by) return res.status(400).json({ error: 'Enter your name.' });
     const { rowCount } = await pool.query(
-      `INSERT INTO suggestions (entry_id, dish)
-         SELECT id, $2 FROM entries WHERE id = $1 AND status = 'approved'`,
-      [id, dish]
+      `INSERT INTO suggestions (entry_id, dish, submitted_by)
+         SELECT id, $2, $3 FROM entries WHERE id = $1 AND status = 'approved'`,
+      [id, dish, by]
     );
     if (!rowCount) return res.status(404).json({ error: 'Not found.' });
     res.status(201).json({ ok: true });

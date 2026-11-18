@@ -240,7 +240,7 @@
           <h3 class="dish"><span>${esc(e.description || "-")}</span>${e.price ? `<span class="pr">${esc(e.price)}</span>` : ""}</h3>
           <div class="pl">${place}${area}${stat}</div>
           <div class="by">${esc(e.submitted_by || "anonymous")}, ${fmtDate(e.created_at)}${e.note ? ": " + esc(e.note) : ""}</div>
-          ${(e.suggestions || []).map((g) => `<div class="by sug">Suggested: <b>${esc(g.dish)}</b><button class="lnk" data-use="${g.id}">Use</button><button class="lnk" data-dismiss="${g.id}">Dismiss</button></div>`).join("")}
+          ${(e.suggestions || []).map((g) => `<div class="by sug">Suggested: <b>${esc(g.dish)}</b>${g.submitted_by ? ` by ${esc(g.submitted_by)}` : ""}<button class="lnk" data-use="${g.id}">Use</button><button class="lnk" data-dismiss="${g.id}">Dismiss</button></div>`).join("")}
           <div class="actions">
             <div class="triedtoggle" role="group" aria-label="Tried status">
               <button data-tried="true"  class="${e.tried ? "on" : ""}">Tried</button>

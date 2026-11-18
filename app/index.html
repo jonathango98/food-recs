@@ -421,10 +421,12 @@
       if (!b) return;
       const dish = (prompt(`What should people order at ${b.dataset.name}?`) || "").trim();
       if (!dish) return;
+      const submitted_by = (prompt("Your name?") || "").trim();
+      if (!submitted_by) return;
       b.disabled = true;
       try {
         const r = await fetch(API_BASE + "/api/entries/" + b.dataset.suggest + "/suggestions", {
-          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ dish }),
+          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ dish, submitted_by }),
         });
         if (!r.ok) throw new Error();
         b.textContent = "Thanks!";
