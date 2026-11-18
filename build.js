@@ -58,9 +58,11 @@ const CITY_META = {
   'LOS ANGELES':  { id: 'la',  name: 'Los Angeles',   region: 'SoCal',    emoji: '🌴' },
   'NEW YORK':     { id: 'ny',  name: 'New York',      region: 'NYC',      emoji: '🗽' },
   'SEATTLE':      { id: 'sea', name: 'Seattle',       region: 'PNW',      emoji: '🌧️' },
+  // wip: shown with a "WIP" tag on its tab. Drop the flag once the list is filled in.
+  'SAN DIEGO':    { id: 'sd',  name: 'San Diego',     region: 'SoCal',    emoji: '🌊', wip: true },
 };
 
-const ORDER = ['la', 'sf', 'ny', 'sea'];
+const ORDER = ['la', 'sf', 'ny', 'sea', 'sd'];
 
 // Parse every data/*.csv into the same shape the guide renders:
 // [{ id, name, region, emoji, count, places: [{ tried, name, cuisine, ... }] }]

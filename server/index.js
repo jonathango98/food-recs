@@ -77,7 +77,7 @@ function requireAdmin(req, res, next) {
   return res.status(401).json({ error: 'Unauthorized' });
 }
 
-const VALID_CITIES = new Set(['la', 'sf', 'ny', 'sea']);
+const VALID_CITIES = new Set(Object.keys(CITY_BY_ID));
 
 // Accept only Yelp business pages, trimmed to https://www.yelp.com/biz/<slug>
 // (drops ?osq=…, #…, /photos; /biz_photos/ and /menu/<slug> map to /biz/<slug>). yelp.to app-share links are followed to that page.
