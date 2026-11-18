@@ -131,6 +131,7 @@
   .pl a:hover { text-decoration-color: var(--red); }
   .pl a svg { width: 14px; height: 14px; color: var(--red); flex: none; }
   .pl .nm { color: var(--ink); font-weight: 600; }
+  .pl .new { font: 700 .65rem/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--red); }
 
   .empty { padding: 40px 0 60px; column-span: all; }
   .empty h2 { font: 900 2rem/1 var(--sans); font-variation-settings: "wdth" 62; color: var(--red); text-transform: uppercase; margin: 0 0 8px; }
@@ -357,7 +358,7 @@
           <span class="no" style="--d:${Math.min(i, 14) * 0.04}s">${p.no}${p.tried ? pen(p.no) + '<span class="sr">, tried</span>' : ""}</span>
           <h3 class="dish">${esc(dish)}</h3>
           <span class="pr">${esc(p.price || "")}</span>
-          <div class="pl">${place}${area}${!p.description && p.id ? `<button class="clear" data-suggest="${p.id}" data-name="${esc(p.name)}">Suggest dish</button>` : ""}</div>
+          <div class="pl">${place}${area}${p.isNew ? `<span class="new">New</span>` : ""}${!p.description && p.id ? `<button class="clear" data-suggest="${p.id}" data-name="${esc(p.name)}">Suggest dish</button>` : ""}</div>
         </div>`;
     }
 

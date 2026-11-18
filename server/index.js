@@ -227,14 +227,15 @@ app.post('/api/entries', (req, res, next) => (isAdmin(req) ? next() : submitLimi
 app.get('/api/places', async (req, res) => {
   try {
     const { rows } = await pool.query(
-      `SELECT id, city, name, cuisine, description, location, price, yelp, tried
+      `SELECT id, city, name, cuisine, description, location, price, yelp, tried,
+              (created_at > now() - interval '30 days' AND submitted_by IS DISTINCT FROM 'seed') AS is_new
          FROM entries WHERE status = 'approved'
         ORDER BY name ASC`
     );
     const byCity = {};
     for (const r of rows) (byCity[r.city] = byCity[r.city] || []).push({
       id: r.id, tried: r.tried, name: r.name, cuisine: r.cuisine, description: r.description,
-      location: r.location, price: r.price, yelp: r.yelp,
+      location: r.location, price: r.price, yelp: r.yelp, isNew: r.is_new,
     });
 
     const cities = ORDER.filter((id) => CITY_BY_ID[id]).map((id) => {
