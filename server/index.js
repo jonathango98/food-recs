@@ -267,10 +267,36 @@ app.get('/api/contributors', async (req, res) => {
       if (handle && !contributors.includes(handle)) contributors.push(handle);
     }
     res.set('Cache-Control', 'no-store');
-    res.json({ contributors });
+    res.json({ contributors, founders: FOUNDERS });
   } catch (err) {
     console.error('GET /api/contributors', err);
-    res.json({ contributors: FOUNDERS });
+    res.json({ contributors: FOUNDERS, founders: FOUNDERS });
+  }
+});
+
+// --- Admin: rename (or merge, by renaming to an existing name) or hide a contributor ---
+// Applies to every entry whose submitted_by maps to this handle.
+app.patch('/api/contributors/:handle', requireAdmin, async (req, res) => {
+  try {
+    const handle = req.params.handle;
+    const b = req.body || {};
+    if (FOUNDERS.includes(handle)) return res.status(400).json({ error: 'Founders are fixed.' });
+    const { rows } = await pool.query(
+      `SELECT DISTINCT submitted_by FROM entries WHERE submitted_by IS NOT NULL AND submitted_by NOT IN ('', 'seed')`
+    );
+    const names = rows.map((r) => r.submitted_by).filter((n) => contributorHandle(n) === handle);
+    if (!names.length) return res.status(404).json({ error: 'Not found.' });
+    if (b.hide === true) {
+      await pool.query('UPDATE entries SET anonymous = TRUE WHERE submitted_by = ANY($1)', [names]);
+    } else {
+      const to = str(b.to, 120);
+      if (!contributorHandle(to)) return res.status(400).json({ error: 'Enter a name.' });
+      await pool.query('UPDATE entries SET submitted_by = $1 WHERE submitted_by = ANY($2)', [to, names]);
+    }
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('PATCH /api/contributors/:handle', err);
+    res.status(500).json({ error: 'Could not update contributor.' });
   }
 });
 
@@ -313,13 +339,16 @@ app.patch('/api/entries/:id', requireAdmin, async (req, res) => {
       vals.push(b.tried === true); sets.push(`tried = $${vals.length}`);
     }
     // Content edits. Only fields present in the body change.
-    const limits = { name: 200, cuisine: 80, description: 300, location: 120, yelp: 500 };
+    const limits = { name: 200, cuisine: 80, description: 300, location: 120, yelp: 500, submitted_by: 120, note: 140 };
     for (const [f, max] of Object.entries(limits)) {
       if (b[f] === undefined) continue;
       let v = str(b[f], max);
       if ((f === 'name' || f === 'cuisine') && !v) return res.status(400).json({ error: `${f} can't be empty.` });
       if (f === 'yelp' && v && !(v = await yelpLink(v))) return res.status(400).json({ error: YELP_ERROR });
       vals.push(v); sets.push(`${f} = $${vals.length}`);
+    }
+    if (b.anonymous !== undefined) {
+      vals.push(b.anonymous === true); sets.push(`anonymous = $${vals.length}`);
     }
     if (b.price !== undefined) {
       if (!['', '$', '$$', '$$$'].includes(b.price)) return res.status(400).json({ error: 'Invalid price.' });

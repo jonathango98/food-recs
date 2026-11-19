@@ -101,6 +101,7 @@
         <button class="chip tab" data-status="rejected" aria-pressed="false">Rejected <span class="n" id="n-rejected"></span></button>
         <button class="chip tab" data-status="suggested" aria-pressed="false">Suggested <span class="n" id="n-suggested"></span></button>
         <button class="chip tab" data-status="all"      aria-pressed="false">All</button>
+        <button class="chip tab" data-status="contributors" aria-pressed="false">Contributors</button>
       </div>
       <div class="field filters" id="filters">
         <input type="search" id="fq" placeholder="Search" aria-label="Search" autocomplete="off" />
@@ -203,6 +204,8 @@
     // ---- Load + render ----
     async function load() {
       $("#list").innerHTML = `<p class="hint">Loading...</p>`;
+      $("#filters").hidden = tab === "contributors";
+      if (tab === "contributors") return loadContributors();
       try {
         const q = tab === "all" ? "" : "?status=" + tab;
         const data = await api("/api/entries" + q);
@@ -214,6 +217,38 @@
           $("#list").innerHTML = `<div class="empty"><h2>Error</h2><p class="err">${esc(err.message)}</p><p><button class="btn-line" id="retry">Retry</button></p></div>`;
       }
     }
+
+    async function loadContributors() {
+      try {
+        const d = await api("/api/contributors");
+        $("#list").innerHTML = (d.contributors || []).map((h, i) => `
+          <div class="it" data-h="${esc(h)}">
+            <span class="no">${i + 1}</span>
+            <h3 class="dish"><span>${esc(h)}</span></h3>
+            ${(d.founders || []).includes(h) ? "" : `<div class="actions"><button class="btn-line" data-rename>Rename</button><button class="btn-line" data-hide>Hide</button></div>`}
+          </div>`).join("");
+      } catch (err) {
+        if (err.message !== "unauthorized") $("#list").innerHTML = `<p class="err">${esc(err.message)}</p>`;
+      }
+    }
+
+    $("#list").addEventListener("click", async (e) => {
+      const b = e.target.closest("[data-rename], [data-hide]");
+      if (!b) return;
+      const h = b.closest("[data-h]").dataset.h;
+      let body;
+      if (b.hasAttribute("data-hide")) {
+        if (!confirm(`Hide ${h} from Contributors?`)) return;
+        body = { hide: true };
+      } else {
+        // An existing person's name merges the two.
+        const to = prompt(`New name for ${h} (e.g. Jane Doe):`);
+        if (!to) return;
+        body = { to };
+      }
+      try { await api("/api/contributors/" + encodeURIComponent(h), { method: "PATCH", body: JSON.stringify(body) }); load(); }
+      catch (err) { alert(err.message); }
+    });
 
     async function refreshCounts() {
       try {
@@ -269,6 +304,9 @@
           <label class="field">Neighborhood<input name="location" value="${esc(e.location)}" /></label>
           <label class="field">Price<select name="price">${opts([["", "-"], ["$", "$"], ["$$", "$$"], ["$$$", "$$$"]], e.price || "")}</select></label>
           <label class="field">Yelp<input name="yelp" type="url" value="${esc(e.yelp)}" /></label>
+          <label class="field">By<input name="submitted_by" maxlength="120" value="${esc(e.submitted_by)}" /></label>
+          <label class="field">Note<input name="note" maxlength="140" value="${esc(e.note)}" /></label>
+          <label class="field"><span><input type="checkbox" name="anonymous"${e.anonymous ? " checked" : ""} /> Anonymous</span></label>
           <div class="edit-actions"><button class="btn-red">Save</button><button type="button" class="btn-line" data-cancel>Cancel</button></div>
         </form>`;
     }
@@ -319,6 +357,7 @@
           f.querySelectorAll("button").forEach((x) => (x.disabled = true));
           const body = Object.fromEntries(new FormData(f));
           if (body.cuisine === "Other") body.cuisine = body.cuisineOther;
+          body.anonymous = f.elements.anonymous.checked;
           try { await patch(body); load(); }
           catch (err) { f.querySelectorAll("button").forEach((x) => (x.disabled = false)); alert(err.message); }
         });
