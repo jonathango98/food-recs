@@ -99,7 +99,9 @@
   .tally .bar { flex: 1; max-width: 220px; height: 4px; background: var(--rule); border-radius: 2px; overflow: hidden; }
   .tally .bar span { display: block; height: 100%; background: var(--red); transition: width .5s cubic-bezier(.16,1,.3,1); }
   .tally .key { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
-  .tally .key svg { width: 30px; height: 24px; overflow: visible; }
+  .tally .tw { position: relative; }
+  .tally .tw path { vector-effect: non-scaling-stroke; }
+  .tally .tw svg { position: absolute; left: 50%; top: 50%; width: calc(100% + 16px); height: 2em; transform: translate(-50%, -52%); overflow: visible; pointer-events: none; }
   .clear { appearance: none; background: none; border: 0; padding: 0; cursor: pointer; font: 600 .95rem var(--sans); color: var(--red); text-decoration: underline; text-underline-offset: 3px; }
 
   /* ---------- Menu ---------- */
@@ -119,7 +121,7 @@
   .it { display: grid; grid-template-columns: 40px 1fr auto; column-gap: 6px; align-items: last baseline; padding: 9px 0; break-inside: avoid; }
   .no { align-self: start; position: relative; font: 800 1.05rem/calc(1.2rem * 1.15) var(--sans); text-align: center; font-variant-numeric: tabular-nums; }
   .no svg { position: absolute; left: 50%; top: 50%; width: 44px; height: 36px; transform: translate(-50%, -54%); overflow: visible; pointer-events: none; }
-  .no path, .key path { fill: none; stroke: var(--pen); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 160; stroke-dashoffset: 0; }
+  .no path, .tw path { fill: none; stroke: var(--pen); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 160; stroke-dashoffset: 0; }
   .menu.draw .no path { animation: pen .55s cubic-bezier(.3,.1,.2,1) both; animation-delay: var(--d, 0s); }
   @keyframes pen { from { stroke-dashoffset: 160; } }
   .dish { margin: 0; font: 700 1.2rem/1.15 var(--sans); min-width: 0; overflow: clip; }
@@ -169,7 +171,7 @@
         </button>
       </div>
       <div class="tally">
-        <span><b id="progNum">0</b> of <span id="progTot">0</span> tried</span>
+        <span><b id="progNum">0</b> of <span id="progTot">0</span> <span class="tw">tried<svg viewBox="0 0 44 36" preserveAspectRatio="none" aria-hidden="true"><path d="M33 7.5C27 3.6 13 4 6.5 10.5 1.6 15.4 3.4 25.5 11 29.6c7.6 4.1 20.6 3.5 27-2.4 5.3-4.9 4.6-13.6-1.4-18.3C31.4 4.8 22.5 3.8 16.8 5.2"/></svg></span></span>
         <span class="bar" aria-hidden="true"><span id="progBar" style="width:0%"></span></span>
         <span class="key" id="resCount"></span>
       </div>
@@ -401,7 +403,7 @@
 
       $("#resCount").innerHTML = anyFilter
         ? `${list.length} shown · <button class="clear" id="clearBtn">Clear</button>`
-        : `<svg viewBox="0 0 44 36" aria-hidden="true"><path d="${LOOPS[0]}"/></svg> = tried`;
+        : "";
       const cb = $("#clearBtn");
       if (cb) cb.addEventListener("click", clearAll);
     }
