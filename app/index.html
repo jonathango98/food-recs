@@ -347,7 +347,7 @@
     }
 
     function item(p, i) {
-      const dish = p.description || "Chef’s choice";
+      const dish = (p.description || "Chef’s choice").replace(/^(.{39}).+$/s, "$1…");
       const c = cityById(state.city);
       const place = p.yelp
         ? `<a href="${esc(p.yelp)}" target="_blank" rel="noopener">${esc(p.name)}${YELP_SVG}<span class="sr">on Yelp (opens in new tab)</span></a>`

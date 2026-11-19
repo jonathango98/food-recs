@@ -181,12 +181,12 @@ app.post('/api/entries', (req, res, next) => (isAdmin(req) ? next() : submitLimi
       city: str(b.city, 8),
       name: str(b.name, 200),
       cuisine: str(b.cuisine, 80),
-      description: str(b.description, 300),
+      description: str(b.description, 40),
       location: str(b.location, 120),
       price: ['$', '$$', '$$$'].includes(b.price) ? b.price : '',
       yelp: str(b.yelp, 500),
       submitted_by: str(b.submitted_by, 120),
-      note: str(b.note, 500),
+      note: str(b.note, 140),
       anonymous: b.anonymous === true,
     };
 
@@ -363,7 +363,7 @@ app.delete('/api/entries/:id', requireAdmin, async (req, res) => {
 app.post('/api/entries/:id/suggestions', rateLimit(20, HOUR), async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const dish = str((req.body || {}).dish, 300);
+    const dish = str((req.body || {}).dish, 40);
     const by = str((req.body || {}).submitted_by, 120);
     if (!dish) return res.status(400).json({ error: 'Enter a dish.' });
     if (!by) return res.status(400).json({ error: 'Enter your name.' });
